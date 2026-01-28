@@ -1,19 +1,21 @@
-// src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Auth from "./pages/Auth.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import GroupsPage from "./pages/GroupsPage.jsx";
-import InvitesPage from "./pages/InvitesPage.jsx";
-import FriendsPage from "./pages/FriendsPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
-import LiveMap from "./pages/LiveMap.jsx";
 import { Toaster } from "react-hot-toast";
-import CreateGroup from "./pages/CreateGroup.jsx";
-import InviteFriend from "./pages/InviteFriend.jsx";
+import ChatbotPage from "./pages/ChatbotPage.jsx";
+import CropAnalysisPage from "./pages/CropAnalysisPage.jsx";
+import SchemesPage from "./pages/SchemesPage.jsx";
+import ExpertHelpPage from "./pages/ExpertHelpPage.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
+import CommunityPage from "./pages/CommunityPage.jsx";
+import RequestCommunity from "./pages/RequestCommunity.jsx";
 import AppLayout from "./AppLayout/applayout.jsx";
 import { NotificationProvider } from "./contexts/NotificationContext.jsx";
+import { LanguageProvider } from "./contexts/LanguageContext.jsx";
+import { AuthProvider } from "./contexts/AuthContext.jsx";
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -46,95 +48,112 @@ export default function App() {
   }, []);
 
   return (
-    <NotificationProvider>
-      <Routes>
-        {/* Public Auth Page */}
-        <Route path="/" element={<Auth />} />
+    <LanguageProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <Routes>
+            {/* Public Auth Page */}
+            <Route path="/" element={<Auth />} />
 
-        {/* Layout wrapper for protected pages */}
-        <Route element={<AppLayout />}>
-          <Route
-            path="dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="create-group"
-            element={
-              <ProtectedRoute>
-                <CreateGroup />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="groups"
-            element={
-              <ProtectedRoute>
-                <GroupsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="invites"
-            element={
-              <ProtectedRoute>
-                <InvitesPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="friends"
-            element={
-              <ProtectedRoute>
-                <FriendsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="profile"
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="profile/edit"
-            element={
-              <ProtectedRoute>
-                <EditProfile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="live-map"
-            element={
-              <ProtectedRoute>
-                <LiveMap />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="invite-friend"
-            element={
-              <ProtectedRoute>
-                <InviteFriend />
-              </ProtectedRoute>
-            }
-          />
-        </Route>
+            {/* Layout wrapper for protected pages */}
+            <Route element={<AppLayout />}>
+              <Route
+                path="dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* AgriMitra Features */}
+              <Route
+                path="communities"
+                element={
+                  <ProtectedRoute>
+                    <CommunityPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="communities/request"
+                element={
+                  <ProtectedRoute>
+                    <RequestCommunity />
+                  </ProtectedRoute>
+                }
+              />
+               <Route
+                path="admin"
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
 
-        {/* Redirect unknown routes */}
-        <Route
-          path="*"
-          element={<Navigate to={isLoggedIn ? "/dashboard" : "/"} replace />}
-        />
-      </Routes>
+              <Route
+                path="profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="profile/edit"
+                element={
+                  <ProtectedRoute>
+                    <EditProfile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="chatbot"
+                element={
+                  <ProtectedRoute>
+                    <ChatbotPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="crop-analysis"
+                element={
+                  <ProtectedRoute>
+                    <CropAnalysisPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="schemes"
+                element={
+                  <ProtectedRoute>
+                    <SchemesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="expert-help"
+                element={
+                  <ProtectedRoute>
+                    <ExpertHelpPage />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
 
-      <Toaster position="top-center" reverseOrder={false} />
-    </NotificationProvider>
+            {/* Redirect unknown routes */}
+            <Route
+              path="*"
+              element={<Navigate to={isLoggedIn ? "/dashboard" : "/"} replace />}
+            />
+          </Routes>
+
+          <Toaster position="top-center" reverseOrder={false} />
+        </NotificationProvider>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
+
+

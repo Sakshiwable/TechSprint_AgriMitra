@@ -8,37 +8,45 @@ import { generateToken } from "../utils/jwt.js";
 // 🧾 REGISTER (Signup)
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, mobile, email, password, role } = req.body;
 
     // 🔍 Basic validation
-    if (!name || !email || !password) {
+    if (!name || !mobile || !password) {
       return res
         .status(400)
-        .json({ message: "All fields (name, email, password) are required." });
+        .json({ message: "Name, mobile, and password are required." });
     }
 
     // 🧠 Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ mobile });
     if (existingUser) {
       return res
         .status(400)
-        .json({ message: "User already exists. Please login." });
+        .json({ message: "User with this mobile number already exists." });
     }
 
     // 🔒 Hash password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Hardcode Admin logic
+    let finalRole = role || "farmer";
+    if (email === "jadhavatharv215@gmail.com" || mobile === "8530633712") {
+      finalRole = "admin";
+    }
+
     // 🆕 Create new user
     const newUser = await User.create({
       name,
-      email,
+      mobile,
+      email: email || "", // Optional
       passwordHash: hashedPassword,
+      role: finalRole, // Default to 'farmer' if not provided
     });
 
     // 🔑 Generate JWT token
     const token = generateToken(newUser._id);
 
-    console.log(`✅ New user registered: ${newUser.email}`);
+    console.log(`✅ New user registered: ${newUser.mobile}`);
 
     res.status(201).json({
       message: "Signup successful!",
@@ -46,7 +54,8 @@ export const registerUser = async (req, res) => {
       user: {
         id: newUser._id,
         name: newUser.name,
-        email: newUser.email,
+        role: newUser.role,
+        mobile: newUser.mobile,
       },
     });
   } catch (error) {
@@ -60,17 +69,17 @@ export const registerUser = async (req, res) => {
 // 🔑 LOGIN (existing user)
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { mobile, password } = req.body;
 
     // 🧠 Check required fields
-    if (!email || !password) {
+    if (!mobile || !password) {
       return res
         .status(400)
-        .json({ message: "Email and password are required." });
+        .json({ message: "Mobile and password are required." });
     }
 
-    // 🔍 Find user by email
-    const user = await User.findOne({ email });
+    // 🔍 Find user by mobile
+    const user = await User.findOne({ mobile });
     if (!user) {
       return res
         .status(404)
@@ -80,14 +89,14 @@ export const loginUser = async (req, res) => {
     // 🔑 Compare passwords
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
-      console.warn(`⚠️ Invalid password for user: ${email}`);
-      return res.status(400).json({ message: "Invalid email or password." });
+      console.warn(`⚠️ Invalid password for user: ${mobile}`);
+      return res.status(400).json({ message: "Invalid mobile or password." });
     }
 
     // 🎟️ Generate token
     const token = generateToken(user._id);
 
-    console.log(`✅ User logged in: ${email}`);
+    console.log(`✅ User logged in: ${mobile}`);
 
     res.status(200).json({
       message: "Login successful!",
@@ -96,6 +105,9 @@ export const loginUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        mobile: user.mobile,
+        avatar: user.avatar,
+        role: user.role,
       },
     });
   } catch (error) {

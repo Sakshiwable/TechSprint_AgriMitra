@@ -231,13 +231,21 @@ export const initSocket = (server) => {
       }
     });
 
+    // 🌾 COMMUNITY EVENTS
+    socket.on("joinCommunity", ({ communityId }) => {
+      if (!communityId) return;
+      socket.join(communityId);
+      console.log(`🌾 User ${socket.userId} joined community ${communityId}`);
+    });
+
+    socket.on("leaveCommunity", ({ communityId }) => {
+      if (!communityId) return;
+      socket.leave(communityId);
+    });
+
     // 🚪 DISCONNECT
     socket.on("disconnect", async () => {
       console.log(`🔴 User disconnected: ${socket.id}`);
-      await GroupMember.updateOne(
-        { userId: socket.userId },
-        { isOnline: false }
-      );
     });
   });
 

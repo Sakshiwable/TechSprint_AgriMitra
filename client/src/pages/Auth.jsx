@@ -3,7 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Send, User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Send, User, Mail, Lock, Eye, EyeOff, Sprout, Briefcase } from "lucide-react";
 import bgVideo from "../assets/background.mp4";
 
 export default function Auth() {
@@ -11,9 +11,11 @@ export default function Auth() {
   const [isSignup, setIsSignup] = useState(true);
   const [form, setForm] = useState({
     name: "",
+    mobile: "",
     email: "",
     password: "",
     confirmPassword: "",
+    role: "farmer",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -46,8 +48,14 @@ export default function Auth() {
         : "http://localhost:4000/api/auth/login";
 
       const payload = isSignup
-        ? { name: form.name, email: form.email, password: form.password }
-        : { email: form.email, password: form.password };
+        ? {
+            name: form.name,
+            mobile: form.mobile,
+            email: form.email, // Optional, for admin check
+            password: form.password,
+            role: form.role,
+          }
+        : { mobile: form.mobile, password: form.password };
 
       const res = await axios.post(endpoint, payload, {
         headers: { "Content-Type": "application/json" },
@@ -135,18 +143,43 @@ export default function Auth() {
 
             <label className="block">
               <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
-                <Mail size={14} className="mr-2 text-cyan-600" /> Email
+                <Mail size={14} className="mr-2 text-cyan-600" /> Mobile Number
               </div>
               <input
-                name="email"
-                type="email"
-                value={form.email}
+                name="mobile"
+                type="tel"
+                value={form.mobile}
                 onChange={handleChange}
                 required
+                pattern="[0-9]{10}"
                 className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
-                placeholder="you@example.com"
+                placeholder="10-digit mobile number"
               />
             </label>
+
+            {/* Admin Email (Hidden/Optional) - shown only if specific sequence or just let them upgrade later? 
+                Actually, the requirements say "make jadhavatharv215@gmail.com as a admin email".
+                So we should add an Email field too, but optional?
+                Let's double check requirement: "by usiing mobile number the login and signin shuold happen". 
+                "admin email ... as admin email". 
+                So maybe I should keep Email field for signup, but Login is Mobile?
+                Or just add Email as optional field in Signup.
+             */}
+            {isSignup && (
+              <label className="block">
+                <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
+                  <Mail size={14} className="mr-2 text-cyan-600" /> Email (Optional)
+                </div>
+                <input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                  placeholder="For admin access"
+                />
+              </label>
+            )}
 
             {isSignup ? (
               // Signup: Password fields side by side
@@ -163,7 +196,7 @@ export default function Auth() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 pr-12 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
-                      placeholder="Create a secure password"
+                      placeholder="Create password"
                     />
                     <button
                       type="button"
@@ -181,7 +214,6 @@ export default function Auth() {
                 <label className="block">
                   <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
                     <Lock size={14} className="mr-2 text-cyan-600" /> Confirm
-                    Password
                   </div>
                   <div className="relative">
                     <input
@@ -196,7 +228,7 @@ export default function Auth() {
                           ? "border-red-300 focus:ring-red-200"
                           : "border-cyan-100 focus:ring-cyan-200"
                       }`}
-                      placeholder="Confirm your password"
+                      placeholder="Confirm"
                     />
                     <button
                       type="button"
@@ -217,12 +249,6 @@ export default function Auth() {
                       )}
                     </button>
                   </div>
-                  {form.confirmPassword &&
-                    form.password !== form.confirmPassword && (
-                      <p className="text-xs text-red-500 mt-1">
-                        Passwords do not match
-                      </p>
-                    )}
                 </label>
               </div>
             ) : (
@@ -253,6 +279,37 @@ export default function Auth() {
                   </button>
                 </div>
               </label>
+            )}
+
+            {isSignup && (
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div
+                  onClick={() => setForm({ ...form, role: "farmer" })}
+                  className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center justify-center transition ${
+                    form.role === "farmer"
+                      ? "bg-teal-50 border-teal-500 ring-1 ring-teal-500"
+                      : "bg-white border-cyan-100 hover:bg-slate-50"
+                  }`}
+                >
+                  <Sprout size={24} className={form.role === "farmer" ? "text-teal-600" : "text-slate-400"} />
+                  <span className={`text-sm font-medium mt-2 ${form.role === "farmer" ? "text-teal-700" : "text-slate-500"}`}>
+                    Farmer
+                  </span>
+                </div>
+                <div
+                  onClick={() => setForm({ ...form, role: "expert" })}
+                  className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center justify-center transition ${
+                    form.role === "expert"
+                      ? "bg-teal-50 border-teal-500 ring-1 ring-teal-500"
+                      : "bg-white border-cyan-100 hover:bg-slate-50"
+                  }`}
+                >
+                  <Briefcase size={24} className={form.role === "expert" ? "text-teal-600" : "text-slate-400"} />
+                  <span className={`text-sm font-medium mt-2 ${form.role === "expert" ? "text-teal-700" : "text-slate-500"}`}>
+                    Expert
+                  </span>
+                </div>
+              </div>
             )}
 
             <button

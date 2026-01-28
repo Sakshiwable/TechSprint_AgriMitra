@@ -12,7 +12,8 @@ const LocationSchema = new mongoose.Schema(
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, default: "" }, // optional now
+    mobile: { type: String, required: true, unique: true },
     passwordHash: { type: String, required: true },
     avatar: { type: String, default: "" }, // profile picture URL
     bio: { type: String, default: "" },
@@ -20,6 +21,7 @@ const userSchema = new mongoose.Schema(
     defaultLocation: LocationSchema, // user's default location
     currentLocation: LocationSchema, // live/current location if shared
     socketId: String,
+    role: { type: String, enum: ["farmer", "expert", "admin"], default: "farmer" },
     groups: [{ type: mongoose.Schema.Types.ObjectId, ref: "Group" }],
   },
   { timestamps: true }
