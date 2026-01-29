@@ -79,17 +79,7 @@ export default function Auth() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center px-4 py-8 overflow-y-auto">
-      {/* Background video */}
-      <video
-        className="fixed inset-0 w-full h-full object-cover -z-10"
-        src={bgVideo}
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-hidden="true"
-      />
-
+ 
       {/* subtle tint + blur overlay for readability */}
       <div className="fixed inset-0 bg-gradient-to-br from-cyan-600/20 via-teal-500/12 to-white/10 -z-10" />
 
