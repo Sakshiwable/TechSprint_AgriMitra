@@ -2,6 +2,7 @@ import React, { useLayoutEffect, useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, BarChart3, CloudRain, ShieldCheck, Sprout, TrendingUp, Users, Zap, Globe, Leaf, ChevronDown } from 'lucide-react';
+import bgImg from "../assets/image.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -164,6 +165,12 @@ export default function Dashboard() {
         ref={heroRef}
         className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center overflow-hidden"
       >
+            {/* Background video (covers entire app) */}
+      <img
+        className="fixed inset-0 w-full bg-white  h-full object-cover -z-20"
+        src={bgImg}
+        aria-hidden="true"
+      />
         <div className="hero-content relative z-10 text-center px-6 max-w-6xl mt-[-5vh]">
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-8 overflow-hidden">
             <span className="hero-title-word text-6xl bg-clip-text bg-gradient-to-br from-green-700 to-emerald-500  md:text-9xl font-black text-transparent tracking-tighter  drop-shadow-sm">

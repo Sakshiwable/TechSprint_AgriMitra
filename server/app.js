@@ -9,6 +9,7 @@ import schemeRoutes from "./routes/schemeRoutes.js";
 import expertRoutes from "./routes/expertRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js"; // keeping for chat messages if reused
 import uploadRoutes from "./routes/uploadRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
 import path from "path"; // Required for static serving
 import { fileURLToPath } from "url";
 
@@ -37,6 +38,7 @@ app.use("/api/schemes", schemeRoutes);
 app.use("/api/experts", expertRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/chat", chatRoutes);
 
 // 📂 Serve Static Uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

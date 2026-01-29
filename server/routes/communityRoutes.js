@@ -7,7 +7,8 @@ import {
   approveCommunity, 
   getCommunityDetails,
   getCommunityMessages,
-  sendCommunityMessage
+  sendCommunityMessage,
+  leaveCommunity
 } from "../controllers/communityController.js";
 import { protect } from "../middleware/auth.js";
 
@@ -16,6 +17,7 @@ const router = express.Router();
 router.get("/", getCommunities);
 router.post("/request", protect, requestCommunity);
 router.post("/:communityId/join", protect, joinCommunity);
+router.post("/:communityId/leave", protect, leaveCommunity);
 router.get("/:communityId", protect, getCommunityDetails);
 
 // Chat Routes

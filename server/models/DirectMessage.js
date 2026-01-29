@@ -20,9 +20,10 @@ const directMessageSchema = new mongoose.Schema(
     },
     messageType: {
       type: String,
-      enum: ["text", "location", "voice"],
+      enum: ["text", "location", "voice", "image", "file"],
       default: "text",
     },
+    attachmentUrl: { type: String }, // For images/files
     voiceUrl: {
       type: String, // URL or base64 data URL for voice message
     },

@@ -8,12 +8,7 @@ import bgImg from "../assets/image.png";
 const AppLayout = () => {
   return (
     <div className="relative min-h-screen  ">
-      {/* Background video (covers entire app) */}
-      <img
-        className="fixed inset-0 w-full bg-white  h-full object-cover -z-20"
-        src={bgImg}
-        aria-hidden="true"
-      />
+  
 
       {/* Subtle tint for better readability */}
       <div

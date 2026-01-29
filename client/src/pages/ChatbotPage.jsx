@@ -65,7 +65,7 @@ export default function ChatbotPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-20 pb-10 px-4 md:px-0 flex flex-col items-center">
+    <div className="min-h-screen bg-slate-50 pt-6 pb-10 px-4 md:px-0 flex flex-col items-center">
       <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-cyan-100 overflow-hidden flex flex-col h-[80vh]">
         {/* Header */}
         <div className="bg-gradient-to-r from-teal-600 to-cyan-600 p-4 flex items-center justify-between text-white shadow-md">

@@ -57,6 +57,27 @@ export const joinCommunity = async (req, res) => {
   }
 };
 
+// Leave Community
+export const leaveCommunity = async (req, res) => {
+  try {
+    const { communityId } = req.params;
+    const community = await Community.findById(communityId);
+
+    if (!community) return res.status(404).json({ message: "Community not found" });
+
+    // Remove user from members
+    community.members = community.members.filter(
+      (memberId) => memberId.toString() !== req.userId
+    );
+
+    await community.save();
+
+    res.status(200).json({ message: "Left community successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error leaving community", error: error.message });
+  }
+};
+
 // Get Community Details
 export const getCommunityDetails = async (req, res) => {
   try {

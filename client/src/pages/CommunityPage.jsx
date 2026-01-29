@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { 
   Search, Plus, MapPin, MoreVertical, Phone, Video, 
-  ArrowLeft, Send, Paperclip, Mic, Image as ImageIcon 
+  ArrowLeft, Send, Paperclip, Mic, Image as ImageIcon,
+  LogOut, X, Users, File
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -141,7 +142,6 @@ export default function CommunityPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      // setMessages([...messages, res.data]); // Let socket handle the update
       setNewMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
@@ -174,6 +174,70 @@ export default function CommunityPage() {
       );
     }
   };
+
+  // --- New Features: Uploads & Menu Logic ---
+
+  const handleFileUpload = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const toastId = toast.loading("Uploading...");
+
+      try {
+          const token = localStorage.getItem("token");
+          // 1. Upload
+          const uploadRes = await axios.post("http://localhost:4000/api/upload", formData, {
+              headers: { 
+                  "Content-Type": "multipart/form-data",
+                  Authorization: `Bearer ${token}`
+              }
+          });
+          
+          const fileUrl = uploadRes.data.url;
+          const isImage = file.type.startsWith("image/");
+
+          // 2. Send Message with Link/Image
+          await axios.post(
+              `http://localhost:4000/api/communities/${selectedGroup._id}/messages`,
+              { 
+                  content: fileUrl, 
+                  messageType: isImage ? "image" : "file" // You might need to update Schema if strict enum, else 'text' works with logic
+              },
+              { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          toast.success("Sent!", { id: toastId });
+      } catch (err) {
+          console.error("Upload error", err);
+          toast.error("Upload failed", { id: toastId });
+      }
+  };
+
+  const handleLeaveCommunity = async () => {
+      if(!selectedGroup) return;
+      if(!window.confirm(`Are you sure you want to leave ${selectedGroup.name}?`)) return;
+
+      try {
+          const token = localStorage.getItem("token");
+          await axios.post(`http://localhost:4000/api/communities/${selectedGroup._id}/leave`, {}, {
+              headers: { Authorization: `Bearer ${token}` }
+          });
+          toast.success(`Left ${selectedGroup.name}`);
+          setSelectedGroup(null);
+          fetchCommunities(); // Refresh list
+      } catch (err) {
+          console.error(err);
+          toast.error("Failed to leave community");
+      }
+  };
+
+  // Menu State
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showMembersModal, setShowMembersModal] = useState(false);
 
 
   // Audio State
@@ -245,8 +309,6 @@ export default function CommunityPage() {
           { content: audioUrl, messageType: "audio" },
           { headers: { Authorization: `Bearer ${token}` } }
        );
-
-       // Note: Socket will handle adding it to the list
     } catch (err) {
        console.error("Error sending voice message:", err);
        toast.error("Failed to send voice message");
@@ -254,7 +316,7 @@ export default function CommunityPage() {
   };
 
   return (
-    <div className="h-screen bg-slate-50 flex overflow-hidden pt-16">
+    <div className="h-[calc(100vh-4rem)] bg-slate-50 flex overflow-hidden">
       {/* Sidebar (Group List) */}
       <div
         className={`${
@@ -351,16 +413,38 @@ export default function CommunityPage() {
                 </div>
               </div>
               
-              <div className="flex items-center gap-1 md:gap-3 text-teal-600">
-                 <button className="p-2 hover:bg-slate-100 rounded-full">
-                   <Phone size={20} />
-                 </button>
-                 <button className="p-2 hover:bg-slate-100 rounded-full">
-                   <Video size={20} />
-                 </button>
-                 <button className="p-2 hover:bg-slate-100 rounded-full">
+              <div className="relative">
+                 <button 
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="p-2 hover:bg-slate-100 rounded-full text-slate-600 transition"
+                 >
                    <MoreVertical size={20} />
                  </button>
+
+                 <AnimatePresence>
+                     {isMenuOpen && (
+                         <motion.div 
+                             initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                             animate={{ opacity: 1, scale: 1, y: 0 }}
+                             exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                             className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 origin-top-right"
+                         >
+                             <button onClick={() => { setShowInfoModal(true); setIsMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm text-slate-700 flex items-center gap-2">
+                                 <MoreVertical size={16} /> Community Info
+                             </button>
+                             <button onClick={() => { setShowMembersModal(true); setIsMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm text-slate-700 flex items-center gap-2">
+                                 <Users size={16} /> Members
+                             </button>
+                             <div className="h-px bg-gray-100 my-1"/>
+                             <button onClick={() => { setSelectedGroup(null); setIsMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-slate-50 text-sm text-slate-700 flex items-center gap-2">
+                                 <X size={16} /> Close Chat
+                             </button>
+                             <button onClick={() => { handleLeaveCommunity(); setIsMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-red-50 text-sm text-red-600 flex items-center gap-2">
+                                 <LogOut size={16} /> Exit Community
+                             </button>
+                         </motion.div>
+                     )}
+                 </AnimatePresence>
               </div>
             </div>
 
@@ -395,6 +479,15 @@ export default function CommunityPage() {
                           
                           {msg.messageType === 'audio' ? (
                              <audio controls src={`http://localhost:4000${msg.content}`} className="w-64 h-10 mt-1" />
+                          ) : msg.messageType === 'image' ? (
+                              <div className="rounded-lg overflow-hidden mt-1 max-w-xs">
+                                  <img src={`http://localhost:4000${msg.content}`} alt="Attachment" className="w-full h-auto cursor-pointer hover:scale-105 transition" onClick={() => window.open(`http://localhost:4000${msg.content}`, '_blank')} />
+                              </div>
+                          ) : msg.messageType === 'file' ? (
+                              <div className="mt-1 flex items-center gap-2 p-2 bg-slate-50 rounded border border-slate-200 hover:bg-slate-100 transition cursor-pointer" onClick={() => window.open(`http://localhost:4000${msg.content}`, '_blank')}>
+                                  <Paperclip size={16} className="text-slate-500" />
+                                  <span className="text-sm underline text-blue-600 truncate max-w-[150px]">Attachment</span>
+                              </div>
                           ) : (
                              <p className="text-sm text-slate-800 break-words">{msg.content}</p>
                           )}
@@ -410,7 +503,7 @@ export default function CommunityPage() {
             </div>
 
             {/* Input Area */}
-            <div className="bg-[#f0f2f5] p-3 flex items-center gap-2 md:gap-4 shrink-0">
+            <div className="bg-[#f0f2f5] p-3 flex items-center gap-2 md:gap-4 shrink-0 z-10">
                <button className="p-2 text-slate-500 hover:text-slate-600">
                  <Plus size={24} />
                </button>
@@ -424,8 +517,14 @@ export default function CommunityPage() {
                     disabled={isRecording}
                   />
                   <div className="flex items-center gap-3 text-slate-400">
-                     <Paperclip size={20} className="cursor-pointer hover:text-slate-600" />
-                     <ImageIcon size={20} className="cursor-pointer hover:text-slate-600" />
+                     <label className="cursor-pointer hover:text-slate-600">
+                         <input type="file" className="hidden" onChange={handleFileUpload} />
+                         <Paperclip size={20} />
+                     </label>
+                     <label className="cursor-pointer hover:text-slate-600">
+                         <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
+                         <ImageIcon size={20} />
+                     </label>
                   </div>
                </div>
                {newMessage.trim() ? (
@@ -449,6 +548,80 @@ export default function CommunityPage() {
                  </button>
                )}
             </div>
+
+            {/* Modals */}
+            <AnimatePresence>
+                {/* Community Info Modal */}
+                {showInfoModal && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
+                        >
+                            <div className="h-32 bg-teal-600 relative">
+                                <button onClick={() => setShowInfoModal(false)} className="absolute top-4 right-4 bg-black/20 text-white p-1 rounded-full"><X size={20}/></button>
+                            </div>
+                            <div className="px-6 pb-6 -mt-10">
+                                <div className="w-20 h-20 rounded-full bg-white p-1 shadow-md">
+                                    <div className="w-full h-full rounded-full bg-slate-200 overflow-hidden flex items-center justify-center font-bold text-2xl text-slate-500">
+                                        {selectedGroup.image ? <img src={selectedGroup.image} className="w-full h-full object-cover"/> : selectedGroup.name[0]}
+                                    </div>
+                                </div>
+                                <h2 className="text-2xl font-bold text-slate-800 mt-3">{selectedGroup.name}</h2>
+                                <p className="text-teal-600 font-medium">{selectedGroup.topic}</p>
+                                
+                                <div className="mt-4 p-4 bg-slate-50 rounded-xl">
+                                    <h4 className="font-bold text-slate-700 text-sm mb-1 uppercase tracking-wider">Description</h4>
+                                    <p className="text-slate-600 text-sm leading-relaxed">{selectedGroup.description || "No description available."}</p>
+                                </div>
+
+                                <div className="mt-4 flex gap-4 text-center">
+                                    <div className="flex-1 p-3 border border-slate-100 rounded-lg">
+                                        <div className="text-xl font-bold text-slate-800">{selectedGroup.members?.length || 0}</div>
+                                        <div className="text-xs text-slate-400 uppercase">Members</div>
+                                    </div>
+                                    <div className="flex-1 p-3 border border-slate-100 rounded-lg">
+                                        <div className="text-xl font-bold text-slate-800">{new Date(selectedGroup.createdAt).getFullYear()}</div>
+                                        <div className="text-xs text-slate-400 uppercase">Created</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+
+                {/* Members Modal */}
+                {showMembersModal && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                        <motion.div 
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl h-[60vh] flex flex-col"
+                        >
+                            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+                                <h3 className="font-bold text-lg text-slate-800">Community Members</h3>
+                                <button onClick={() => setShowMembersModal(false)} className="text-slate-400 hover:text-slate-600"><X size={20}/></button>
+                            </div>
+                            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                                {selectedGroup.members?.map((member) => (
+                                    <div key={member._id || member} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition">
+                                        <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-700">
+                                            {member.avatar ? <img src={member.avatar} className="w-full h-full rounded-full object-cover"/> : (member.name?.[0] || 'U')}
+                                        </div>
+                                        <div>
+                                            <div className="font-semibold text-slate-800 text-sm">{member.name || "Unknown User"}</div>
+                                            <div className="text-xs text-slate-500">Member</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
 
           </>
         ) : (
