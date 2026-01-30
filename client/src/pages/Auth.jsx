@@ -54,6 +54,11 @@ export default function Auth() {
             email: form.email, // Optional, for admin check
             password: form.password,
             role: form.role,
+            state: form.state,
+            district: form.district,
+            cropType: form.cropType,
+            landSize: form.landSize,
+            category: form.category,
           }
         : { mobile: form.mobile, password: form.password };
 
@@ -169,6 +174,85 @@ export default function Auth() {
                   placeholder="For admin access"
                 />
               </label>
+            )}
+
+            {isSignup && (
+              <>
+                 <label className="block">
+                  <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
+                    <User size={14} className="mr-2 text-cyan-600" /> State
+                  </div>
+                  <input
+                    name="state"
+                    value={form.state || ""}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                    placeholder="e.g. Maharashtra"
+                  />
+                </label>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <label className="block">
+                    <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
+                      District
+                    </div>
+                    <input
+                      name="district"
+                      value={form.district || ""}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                      placeholder="e.g. Pune"
+                    />
+                  </label>
+                   <label className="block">
+                    <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
+                      Land Size (Acres)
+                    </div>
+                    <input
+                      name="landSize"
+                      type="number"
+                      value={form.landSize || ""}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                      placeholder="e.g. 2.5"
+                    />
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <label className="block">
+                    <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
+                      Crop Type
+                    </div>
+                    <input
+                      name="cropType"
+                      value={form.cropType || ""}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                      placeholder="e.g. Rice"
+                    />
+                  </label>
+                   <label className="block">
+                    <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
+                      Category
+                    </div>
+                    <select
+                      name="category"
+                      value={form.category || ""}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                    >
+                      <option value="">Select Category</option>
+                      <option value="Small">Small Farmer</option>
+                      <option value="Marginal">Marginal Farmer</option>
+                      <option value="SC">SC</option>
+                      <option value="ST">ST</option>
+                      <option value="OBC">OBC</option>
+                      <option value="General">General</option>
+                    </select>
+                  </label>
+                </div>
+              </>
             )}
 
             {isSignup ? (

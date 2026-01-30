@@ -18,6 +18,14 @@ const userSchema = new mongoose.Schema(
     avatar: { type: String, default: "" }, // profile picture URL
     bio: { type: String, default: "" },
     instagram: { type: String, default: "" }, // Instagram username
+    
+    // Farmer specific details
+    state: { type: String, default: "" },
+    district: { type: String, default: "" },
+    cropType: { type: String, default: "" }, // e.g., Rice, Wheat
+    landSize: { type: Number, default: 0 }, // in acres
+    category: { type: String, default: "" }, // e.g., Small, Marginal, SC/ST
+
     defaultLocation: LocationSchema, // user's default location
     currentLocation: LocationSchema, // live/current location if shared
     socketId: String,

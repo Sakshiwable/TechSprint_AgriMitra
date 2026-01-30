@@ -8,7 +8,10 @@ import { generateToken } from "../utils/jwt.js";
 // 🧾 REGISTER (Signup)
 export const registerUser = async (req, res) => {
   try {
-    const { name, mobile, email, password, role } = req.body;
+    const { 
+      name, mobile, email, password, role,
+      state, district, cropType, landSize, category 
+    } = req.body;
 
     // 🔍 Basic validation
     if (!name || !mobile || !password) {
@@ -28,10 +31,19 @@ export const registerUser = async (req, res) => {
     // 🔒 Hash password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Hardcode Admin logic
-    let finalRole = role || "farmer";
-    if (email === "jadhavatharv215@gmail.com" || mobile === "8530633712") {
-      finalRole = "admin";
+    // 🛡️ ADMIN CHECK (Hardcoded Security)
+    const ADMIN_MOBILE = "8530633712";
+    const ADMIN_EMAIL = "jadhavatharv215@gmail.com"; // Fixed typo
+
+    let finalRole = "farmer"; // Default
+
+    // If credentials match Admin, force Admin role
+    if (mobile === ADMIN_MOBILE || email === ADMIN_EMAIL) {
+        finalRole = "admin";
+    } else {
+        // If user tries to register as admin but isn't the Authorized One, force farmer
+        if (role === "admin") finalRole = "farmer";
+        else finalRole = role || "farmer";
     }
 
     // 🆕 Create new user
@@ -40,11 +52,16 @@ export const registerUser = async (req, res) => {
       mobile,
       email: email || "", // Optional
       passwordHash: hashedPassword,
-      role: finalRole, // Default to 'farmer' if not provided
+      role: finalRole,
+      state: state || "",
+      district: district || "",
+      cropType: cropType || "",
+      landSize: landSize || 0,
+      category: category || "",
     });
 
     // 🔑 Generate JWT token
-    const token = generateToken(newUser._id);
+    const token = generateToken(newUser);
 
     console.log(`✅ New user registered: ${newUser.mobile}`);
 
@@ -93,8 +110,18 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid mobile or password." });
     }
 
+    // 🛡️ ADMIN CHECK (Retroactive Fix)
+    const ADMIN_MOBILE = "8530633712";
+    const ADMIN_EMAIL = "jadhavatharv215@gmail.com";
+    
+    if ((user.mobile === ADMIN_MOBILE || user.email === ADMIN_EMAIL) && user.role !== "admin") {
+        user.role = "admin";
+        await user.save();
+        console.log(`🛡️ Upgraded user ${user.mobile} to Admin on login.`);
+    }
+
     // 🎟️ Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     console.log(`✅ User logged in: ${mobile}`);
 
@@ -193,6 +220,14 @@ export const updateProfile = async (req, res) => {
     if (avatar !== undefined) updates.avatar = avatar;
     if (bio !== undefined) updates.bio = bio;
     if (instagram !== undefined) updates.instagram = instagram;
+    
+    // Ag fields
+    if (req.body.state !== undefined) updates.state = req.body.state;
+    if (req.body.district !== undefined) updates.district = req.body.district;
+    if (req.body.cropType !== undefined) updates.cropType = req.body.cropType;
+    if (req.body.landSize !== undefined) updates.landSize = req.body.landSize;
+    if (req.body.category !== undefined) updates.category = req.body.category;
+
     if (defaultLocation && typeof defaultLocation === "object") {
       updates.defaultLocation = {
         lat: defaultLocation.lat,

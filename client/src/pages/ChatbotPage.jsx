@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { Send, Bot, User, RefreshCw, ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -45,13 +46,16 @@ export default function ChatbotPage() {
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI delay and response
+    // Call Python Chatbot API
     try {
-      const responseText = await generateResponse(userMsg.text, language);
+      const res = await axios.post("http://localhost:5000/chat", {
+        message: userMsg.text,
+        language: language // passed from context
+      });
       
       const botMsg = {
         id: Date.now() + 1,
-        text: responseText,
+        text: res.data.response,
         sender: "bot",
         timestamp: new Date(),
       };
@@ -61,6 +65,12 @@ export default function ChatbotPage() {
     } catch (error) {
       console.error("Chatbot error:", error);
       setIsTyping(false);
+      setMessages((prev) => [...prev, {
+        id: Date.now() + 1,
+        text: "Sorry, I am having trouble connecting to the server.",
+        sender: "bot",
+        timestamp: new Date(),
+      }]);
     }
   };
 

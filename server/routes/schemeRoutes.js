@@ -1,11 +1,16 @@
 import express from "express";
-import { getSchemes, addScheme, deleteScheme } from "../controllers/schemeController.js";
+import { getAllSchemes, getAdminSchemes, verifyScheme, recommendSchemes, createScheme, getSchemeById, deleteScheme, refreshSchemes } from "../controllers/schemeController.js";
 import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/", getSchemes);
-router.post("/", protect, addScheme); // Add admin check middleware if available, else protect
+router.post("/refresh", protect, refreshSchemes); // Call Python Scraper
+router.get("/", getAllSchemes);
+router.post("/recommend", protect, recommendSchemes); // Needs user context
+router.post("/", protect, createScheme); // Ideally admin only, but protect for now
+router.get("/admin/all", protect, getAdminSchemes); // New Admin Route
+router.put("/:id/verify", protect, verifyScheme); // Approve/Edit
+router.get("/:id", getSchemeById);
 router.delete("/:id", protect, deleteScheme);
 
 export default router;

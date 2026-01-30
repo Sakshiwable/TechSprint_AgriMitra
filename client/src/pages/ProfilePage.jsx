@@ -1,384 +1,247 @@
-// src/pages/ProfilePage.jsx
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
-import { motion } from "framer-motion";
-import {
-  Edit,
-  LogOut,
-  Users,
-  MapPin,
-  Calendar,
-  User,
-  Navigation,
-} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { User, LogOut, Calendar, Users, FileText } from "lucide-react";
 
-const API_URL = "http://localhost:4000/api";
-
-export default function ProfilePage() {
-  const [user, setUser] = useState(null);
+const ProfilePage = () => {
   const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchUserProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/");
+          return;
+        }
 
-  const fetchUserProfile = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error("You must be logged in!");
-        navigate("/");
-        return;
+        const res = await axios.get("http://localhost:4000/api/user/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setProfile(res.data);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setLoading(false);
       }
+    };
 
-      const res = await axios.get(`${API_URL}/auth/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      // Accept either { user } or flat user object responses
-      const raw = res.data.user || res.data;
-      // normalize fields used by the UI
-      const normalized = {
-        id: raw._id || raw.id,
-        name: raw.name || "",
-        email: raw.email || "",
-        avatar: raw.avatar || raw.profilePic || "",
-        bio: raw.bio || "",
-        createdAt: raw.createdAt,
-        updatedAt: raw.updatedAt,
-        defaultLocation: raw.defaultLocation || null,
-        currentLocation: raw.currentLocation || null,
-        groups: raw.groups || [],
-        groupsCount:
-          raw.groupsCount ??
-          (Array.isArray(raw.groups) ? raw.groups.length : 0),
-        friendsCount: raw.friendsCount || 0,
-      };
-
-      setUser(normalized);
-    } catch (err) {
-      console.error("Error fetching profile:", err);
-      toast.error("Failed to load profile");
-    }
-  };
+    fetchProfile();
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    toast.success("Logged out");
+    localStorage.removeItem("user");
     navigate("/");
   };
 
-  if (!user)
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gradient-to-br from-cyan-50 to-teal-50">
-        <p className="text-teal-700 font-semibold">Loading profile...</p>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
+  }
 
-  const joined = user.createdAt
-    ? new Date(user.createdAt).toLocaleDateString()
-    : "—";
-  const lastActive = user.updatedAt
-    ? new Date(user.updatedAt).toLocaleString()
-    : "—";
-  const groupsCount = user.groupsCount ?? 0;
-  const friendsCount = user.friendsCount ?? 0;
+  if (!profile) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50">
+        <div className="text-slate-600 text-lg">Failed to load profile.</div>
+        <button onClick={() => navigate("/")} className="mt-4 px-6 py-2 bg-teal-500 text-white rounded-full hover:bg-teal-600 transition">
+          Go to Login
+        </button>
+      </div>
+    );
+  }
 
-  const formatLocation = (location) => {
-    if (!location || location.lat == null || location.lng == null)
-      return "Not set";
-    return `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
-  };
-
-  const defaultLocationStr = formatLocation(user.defaultLocation);
-  const currentLocationStr = formatLocation(user.currentLocation);
+  const { user, stats, communities, consultations, history } = profile;
 
   return (
-    <div className=" w-screen b text-slate-800">
-      <main className="max-w-6xl mx-auto px-6 py-3">
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.36 }}
-          className="relative bg-white rounded-2xl shadow-2xl overflow-hidden border border-cyan-100"
-        >
-          {/* Top decorative header */}
-          <div className="h-32 bg-gradient-to-r from-teal-500 to-cyan-500 p-6">
-            <div className="max-w-6xl mx-auto flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <img
-                  src={
-                    user.avatar ||
-                    "https://i.pinimg.com/736x/18/29/0d/18290d41f79704b228279b717ff30bf6.jpg"
-                  }
-                  alt="avatar"
-                  className="w-20 h-20 rounded-full bg-white/20 ring-4 ring-white object-cover shadow-lg"
-                />
-
-                <div className="text-white">
-                  <h1 className="text-2xl font-extrabold leading-tight">
-                    {user.name || "Unknown User"}
-                  </h1>
-                  <p className="text-sm opacity-90 mt-1">{user.email}</p>
-                </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-teal-50/30 p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        
+        {/* Header Card */}
+        <div className="bg-white rounded-3xl p-8 shadow-lg border border-slate-100">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+            {/* Avatar */}
+            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white text-4xl font-bold shadow-xl ring-4 ring-teal-100">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+            
+            {/* User Info */}
+            <div className="flex-1 text-center md:text-left">
+              <h1 className="text-3xl font-bold text-slate-800 mb-2">{user.name}</h1>
+              <p className="text-slate-500 mb-3 capitalize">
+                {user.role} • {user.district ? `${user.district}, ` : ""}{user.state || "Location Not Set"}
+              </p>
+              
+              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                {user.cropType && (
+                  <span className="px-4 py-1.5 rounded-full bg-teal-50 text-teal-700 text-sm font-medium border border-teal-100">
+                    🌾 {user.cropType}
+                  </span>
+                )}
+                {user.landSize ? (
+                  <span className="px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm font-medium border border-blue-100">
+                    📏 {user.landSize} Acres
+                  </span>
+                ) : null}
+                {user.category && (
+                  <span className="px-4 py-1.5 rounded-full bg-orange-50 text-orange-700 text-sm font-medium border border-orange-100">
+                    {user.category}
+                  </span>
+                )}
               </div>
+            </div>
+            
+            {/* Logout Button */}
+            <button 
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-all font-medium"
+            >
+              <LogOut size={18} />
+              Logout
+            </button>
+          </div>
+        </div>
 
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => navigate("/profile/edit")}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 text-white border border-white/10 hover:brightness-110 transition"
-                >
-                  <Edit size={16} /> Edit
-                </button>
-
-                <button
-                  onClick={handleLogout}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-teal-700 hover:bg-white/90 transition shadow-sm"
-                >
-                  <LogOut size={16} /> Logout
-                </button>
+        {/* Stats Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-teal-50 rounded-xl">
+                <Users className="text-teal-600" size={24} />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-slate-800">{stats.communitiesJoined}</div>
+                <div className="text-sm text-slate-500">Communities</div>
               </div>
             </div>
           </div>
-
-          {/* Content */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 md:p-8">
-            {/* Left: Profile card */}
-            <div className="md:col-span-1 bg-white rounded-xl border border-cyan-50 shadow-sm p-6">
-              <div className="flex flex-col items-center text-center">
-                <img
-                  src={
-                    user.avatar ||
-                    "https://i.pinimg.com/736x/18/29/0d/18290d41f79704b228279b717ff30bf6.jpg"
-                  }
-                  alt="avatar"
-                  className="w-28 h-28 rounded-full mb-4 ring-4 ring-cyan-50 object-cover"
-                />
-                <h2 className="text-lg font-semibold text-teal-700">
-                  {user.name || "Unknown"}
-                </h2>
-                <p className="text-sm text-slate-600 mt-1">{user.email}</p>
-
-                {/* Bio Section */}
-                {user.bio && (
-                  <div className="mt-4 w-full bg-teal-200/50 p-3 rounded-lg">
-                  
-                    <p className="text-sm text-teal-700 leading-relaxed text-left">
-                      {user.bio}
-                    </p>
-                  </div>
-                )}
-
-                <div className="mt-6 w-full grid grid-cols-3 gap-3">
-                  <div className="py-3 px-2 rounded-lg bg-gradient-to-tr from-cyan-50 to-teal-50 text-center">
-                    <div className="text-sm text-teal-700 font-semibold">
-                      {groupsCount}
-                    </div>
-                    <div className="text-xs text-slate-500 mt-1">Groups</div>
-                  </div>
-
-                  <div className="py-3 px-2 rounded-lg bg-cyan-50 text-center">
-                    <div className="text-sm text-teal-700 font-semibold">—</div>
-                    <div className="text-xs text-slate-500 mt-1">
-                      Live Shares
-                    </div>
-                  </div>
-
-                  <div className="py-3 px-2 rounded-lg bg-teal-50 text-center">
-                    <div className="text-sm text-teal-900 font-semibold">
-                      {friendsCount}
-                    </div>
-                    <div className="text-xs text-slate-500 mt-1">Friends</div>
-                  </div>
-                </div>
-
-                <div className="mt-6 w-full">
-                  <button
-                    onClick={() => navigate("/friends")}
-                    className="w-full inline-flex items-center justify-center gap-2 py-2 rounded-full bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-semibold"
-                  >
-                    <Users size={14} /> View Friends
-                  </button>
-                </div>
+          
+          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-orange-50 rounded-xl">
+                <FileText className="text-orange-600" size={24} />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-slate-800">{stats.pendingRequests}</div>
+                <div className="text-sm text-slate-500">Pending Requests</div>
               </div>
             </div>
-
-            {/* Right: Details */}
-            <div className="md:col-span-2 space-y-6">
-              <div className="bg-white rounded-xl border border-cyan-50 shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-teal-700 mb-3">
-                  Account details
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-cyan-50 text-cyan-700">
-                      <Calendar size={18} />
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-500">Joined</div>
-                      <div className="font-medium text-slate-800">{joined}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-teal-50 text-teal-700">
-                      <Calendar size={18} />
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-500">Last active</div>
-                      <div className="font-medium text-slate-800">
-                        {lastActive}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-cyan-50 text-cyan-700">
-                      <MapPin size={18} />
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-500">
-                        Default location
-                      </div>
-                      <div className="font-medium text-slate-800 text-sm">
-                        {defaultLocationStr}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-teal-50 text-teal-700">
-                      <Navigation size={18} />
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-500">
-                        Current location
-                      </div>
-                      <div className="font-medium text-slate-800 text-sm">
-                        {currentLocationStr}
-                      </div>
-                      {user.currentLocation?.updatedAt && (
-                        <div className="text-xs text-slate-400 mt-1">
-                          Updated:{" "}
-                          {new Date(
-                            user.currentLocation.updatedAt
-                          ).toLocaleString()}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 rounded-lg bg-cyan-50 text-cyan-700">
-                      <Users size={18} />
-                    </div>
-                    <div>
-                      <div className="text-xs text-slate-500">Groups</div>
-                      <div className="font-medium text-slate-800">
-                        {groupsCount}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          </div>
+          
+          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-purple-50 rounded-xl">
+                <Calendar className="text-purple-600" size={24} />
               </div>
+              <div>
+                <div className="text-2xl font-bold text-slate-800">{consultations.length}</div>
+                <div className="text-sm text-slate-500">Total Requests</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-              {/* Groups List */}
-              {user.groups && user.groups.length > 0 && (
-                <div className="bg-white rounded-xl border border-cyan-50 shadow-sm p-6">
-                  <h3 className="text-lg font-semibold text-teal-700 mb-4 flex items-center gap-2">
-                    <Users size={20} />
-                    My Groups ({user.groups.length})
-                  </h3>
-                  <div className="space-y-3">
-                    {user.groups.map((group) => (
-                      <div
-                        key={group._id || group.id}
-                        className="p-4 rounded-lg bg-gradient-to-r from-cyan-50 to-teal-50 border border-cyan-100 hover:shadow-md transition"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-semibold text-teal-800">
-                              {group.groupName || group.name || "Unnamed Group"}
-                            </h4>
-                            {group.destination?.name && (
-                              <p className="text-sm text-slate-600 mt-1">
-                                Destination: {group.destination.name}
-                              </p>
-                            )}
-                            {group.status && (
-                              <span
-                                className={`inline-block mt-2 px-2 py-1 rounded-full text-xs font-medium ${
-                                  group.status === "active"
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-gray-100 text-gray-700"
-                                }`}
-                              >
-                                {group.status}
-                              </span>
-                            )}
-                          </div>
-                          {group.createdAt && (
-                            <div className="text-xs text-slate-500">
-                              {new Date(group.createdAt).toLocaleDateString()}
-                            </div>
-                          )}
-                        </div>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* My Journey */}
+          <div className="lg:col-span-1 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+            <div className="flex items-center gap-2 mb-5">
+              <Calendar className="text-purple-600" size={20} />
+              <h3 className="text-lg font-bold text-slate-800">📅 My Journey</h3>
+            </div>
+            
+            <div className="space-y-4 relative pl-4 border-l-2 border-slate-100">
+              {history.map((item, idx) => (
+                <div key={idx} className="relative">
+                  <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-purple-500 ring-4 ring-white"></div>
+                  <p className="text-sm font-medium text-slate-700">{item.action}</p>
+                  <p className="text-xs text-slate-400 mt-1">{new Date(item.date).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Communities & Requests */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* My Communities */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+              <div className="flex items-center gap-2 mb-5">
+                <Users className="text-teal-600" size={20} />
+                <h3 className="text-lg font-bold text-slate-800">🌱 My Communities</h3>
+              </div>
+              
+              {communities.length === 0 ? (
+                <p className="text-slate-400 text-sm py-4">You haven't joined any communities yet.</p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {communities.map(comm => (
+                    <Link 
+                      to="/communities"
+                      key={comm.id}
+                      className="group p-4 rounded-xl bg-slate-50 hover:bg-teal-50 border border-slate-100 hover:border-teal-200 transition-all"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-semibold text-slate-800 group-hover:text-teal-700">{comm.name}</h4>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-teal-50 text-teal-600 capitalize border border-teal-200">
+                          {comm.topic}
+                        </span>
                       </div>
-                    ))}
-                  </div>
+                      <p className="text-xs text-slate-400">Joined {new Date(comm.joinedAt).toLocaleDateString()}</p>
+                    </Link>
+                  ))}
                 </div>
               )}
-
-              <div className="bg-white rounded-xl border border-cyan-50 shadow-sm p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div>
-                  <h4 className="text-md font-semibold text-teal-700">
-                    Privacy & sharing
-                  </h4>
-                  <p className="text-sm text-slate-500 mt-1">
-                    Control how and when your location is shared with groups.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => navigate("/settings")}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-cyan-100 text-teal-700 hover:bg-cyan-50 transition"
-                  >
-                    Manage settings
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      navigator.clipboard?.writeText(user.email || "");
-                      toast.success("Email copied");
-                    }}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 text-white"
-                  >
-                    Copy email
-                  </button>
-                </div>
-              </div>
-
-              <div className="text-sm text-slate-500">
-                Need more help? Contact support at{" "}
-                <span className="font-medium text-slate-800">
-                  {import.meta.env.VITE_SUPPORT_EMAIL ||
-                    "support@travelsync.app"}
-                </span>
-              </div>
             </div>
-          </div>
-        </motion.div>
-      </main>
 
-      <Footer />
+            {/* Consultation Requests */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+              <div className="flex items-center gap-2 mb-5">
+                <FileText className="text-orange-600" size={20} />
+                <h3 className="text-lg font-bold text-slate-800">📩 Consultation Requests</h3>
+              </div>
+              
+              {consultations.length === 0 ? (
+                <p className="text-slate-400 text-sm py-4">No active consultation requests.</p>
+              ) : (
+                <div className="space-y-3">
+                  {consultations.map(req => (
+                    <div 
+                      key={req._id}
+                      className="p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium text-slate-800 text-sm">Expert Consultation</h4>
+                        <span className={`text-xs px-3 py-1 rounded-full font-medium ${
+                          req.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' :
+                          req.status === 'approved' ? 'bg-green-50 text-green-700 border border-green-200' : 
+                          'bg-red-50 text-red-700 border border-red-200'
+                        }`}>
+                          {req.status}
+                        </span>
+                      </div>
+                      {req.message && (
+                        <p className="text-sm text-slate-600 mb-2 line-clamp-2">"{req.message}"</p>
+                      )}
+                      <p className="text-xs text-slate-400">{new Date(req.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+
+      </div>
     </div>
   );
-}
+};
+
+export default ProfilePage;

@@ -33,7 +33,10 @@ export default function AdminDashboard() {
         const res = await axios.get(`${API_URL}/experts/pending`, { headers });
         setPendingExperts(res.data);
       } else if (activeTab === "schemes") {
-        const res = await axios.get(`${API_URL}/schemes`);
+        const res = await axios.get(`${API_URL}/schemes/admin/all?status=verified`, { headers });
+        setSchemes(res.data);
+      } else if (activeTab === "pending-schemes") {
+        const res = await axios.get(`${API_URL}/schemes/admin/all?status=pending`, { headers });
         setSchemes(res.data);
       }
     } catch (error) {
@@ -61,6 +64,17 @@ export default function AdminDashboard() {
     } catch (error) {
       toast.error("Failed to approve expert");
     }
+  };
+
+  const verifyScheme = async (id, details = {}) => {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.put(`${API_URL}/schemes/${id}/verify`, details, { headers: { Authorization: `Bearer ${token}` } });
+        toast.success("Scheme Verified & Published!");
+        fetchData();
+      } catch (error) {
+        toast.error("Failed to verify scheme");
+      }
   };
 
   const addScheme = async (e) => {
@@ -112,7 +126,13 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab("schemes")}
             className={`pb-3 px-2 font-medium transition ${activeTab === "schemes" ? "text-teal-600 border-b-2 border-teal-600" : "text-slate-500"}`}
           >
-            Manage Schemes
+            Live Schemes
+          </button>
+          <button 
+            onClick={() => setActiveTab("pending-schemes")}
+            className={`pb-3 px-2 font-medium transition ${activeTab === "pending-schemes" ? "text-teal-600 border-b-2 border-teal-600" : "text-orange-500"}`}
+          >
+            Pending Verification
           </button>
         </div>
 
@@ -182,18 +202,21 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* SCHEMES TAB */}
-          {activeTab === "schemes" && (
+          {/* SCHEMES TABS */}
+          {(activeTab === "schemes" || activeTab === "pending-schemes") && (
             <div>
-              <h2 className="text-xl font-semibold mb-4 text-slate-700">Government Schemes</h2>
+              <h2 className="text-xl font-semibold mb-4 text-slate-700">
+                {activeTab === "schemes" ? "Live Government Schemes" : "Scraped Schemes (Require Verification)"}
+              </h2>
               
-              {/* Add Form */}
+              {/* Add Form only on Validated Tab */}
+              {activeTab === "schemes" && (
               <form onSubmit={addScheme} className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-8">
                 <h3 className="font-semibold mb-3 text-sm uppercase tracking-wide text-slate-500">Add New Scheme</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                   <input value={newScheme.title} onChange={e => setNewScheme({...newScheme, title: e.target.value})} placeholder="Scheme Title" className="p-2 border rounded-lg" required />
                   <input value={newScheme.category} onChange={e => setNewScheme({...newScheme, category: e.target.value})} placeholder="Category" className="p-2 border rounded-lg" required />
-                  <input value={newScheme.deadline} onChange={e => setNewScheme({...newScheme, deadline: e.target.value})} placeholder="Deadline (e.g., Dec 31, 2024)" className="p-2 border rounded-lg" required />
+                  <input value={newScheme.deadline} onChange={e => setNewScheme({...newScheme, deadline: e.target.value})} placeholder="Deadline" className="p-2 border rounded-lg" required />
                   <input value={newScheme.link} onChange={e => setNewScheme({...newScheme, link: e.target.value})} placeholder="Official Link (URL)" className="p-2 border rounded-lg" />
                 </div>
                 <textarea value={newScheme.description} onChange={e => setNewScheme({...newScheme, description: e.target.value})} placeholder="Description" className="w-full p-2 border rounded-lg mb-3" rows="2" required />
@@ -201,20 +224,34 @@ export default function AdminDashboard() {
                   <Plus size={18} /> Add Scheme
                 </button>
               </form>
+              )}
 
               {/* List */}
               <div className="space-y-3">
+                 {schemes.length === 0 && <p className="text-slate-500 italic">No schemes found.</p>}
                  {schemes.map((s) => (
                    <div key={s._id} className="flex justify-between items-start border-b border-slate-100 pb-3 last:border-0">
                      <div>
-                       <h4 className="font-bold text-slate-800">{s.title}</h4>
-                       <span className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600">{s.category}</span>
+                       <h4 className="font-bold text-slate-800 flex items-center gap-2">
+                            {s.title}
+                            {!s.verified && <span className="bg-orange-100 text-orange-600 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">Unverified</span>}
+                       </h4>
+                       <span className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600 mr-2">{s.category}</span>
+                       <span className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600">{s.state || "All India"}</span>
                        <p className="text-sm text-slate-500 mt-1">{s.description}</p>
                        <a href={s.link} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline mt-1 block">{s.link}</a>
+                       <div className="text-xs text-slate-400 mt-1">Source: {s.source}</div>
                      </div>
-                     <button onClick={() => deleteScheme(s._id)} className="text-red-400 hover:text-red-600 p-2">
-                       <Trash size={18} />
-                     </button>
+                     <div className="flex gap-2">
+                        {!s.verified && (
+                            <button onClick={() => verifyScheme(s._id)} className="text-green-600 hover:text-green-700 bg-green-50 hover:bg-green-100 px-3 py-1 rounded-lg text-sm font-medium transition">
+                                Approve
+                            </button>
+                        )}
+                        <button onClick={() => deleteScheme(s._id)} className="text-red-400 hover:text-red-600 p-2">
+                            <Trash size={18} />
+                        </button>
+                     </div>
                    </div>
                  ))}
               </div>

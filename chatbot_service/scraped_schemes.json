@@ -1,0 +1,122 @@
+[
+  {
+    "title": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)",
+    "description": "Financial benefit of Rs. 6000/- per year in three equal installments to all landholding farmers' families across the country.",
+    "link": "https://www.myscheme.gov.in/schemes/pmkisan",
+    "tags": ["Agriculture", "Financial Assistance", "Central Sector Scheme"]
+  },
+  {
+    "title": "Pradhan Mantri Fasal Bima Yojana (PMFBY)",
+    "description": "A yield-based crop insurance scheme providing financial support to farmers suffering from crop loss/damage due to natural calamities.",
+    "link": "https://www.myscheme.gov.in/schemes/pmfby",
+    "tags": ["Agriculture", "Insurance", "Crop Protection"]
+  },
+  {
+    "title": "Soil Health Card Scheme",
+    "description": "Provides information to farmers on the nutrient status of their soil along with recommendations on appropriate dosage of nutrients.",
+    "link": "https://www.myscheme.gov.in/schemes/shc",
+    "tags": ["Agriculture", "Soil Health", "Farmer Support"]
+  },
+  {
+    "title": "Paramparagat Krishi Vikas Yojana (PKVY)",
+    "description": "Promotes organic farming through a cluster approach and PGS certification to improve soil health and crop value.",
+    "link": "https://www.myscheme.gov.in/schemes/pkvy",
+    "tags": ["Agriculture", "Organic Farming", "Sustainable"]
+  },
+  {
+    "title": "Pradhan Mantri Krishi Sinchayee Yojana (PMKSY)",
+    "description": "Aimed at providing end-to-end solutions in the irrigation supply chain, covering water sources, distribution, and farm-level applications.",
+    "link": "https://www.myscheme.gov.in/schemes/pmksy",
+    "tags": ["Agriculture", "Irrigation", "Water Management"]
+  },
+  {
+    "title": "National Mission for Sustainable Agriculture (NMSA)",
+    "description": "Focuses on climate change adaptation and promoting sustainable agriculture through optimized water and nutrient management.",
+    "link": "https://www.myscheme.gov.in/schemes/nmsa",
+    "tags": ["Agriculture", "Sustainability", "Environment"]
+  },
+  {
+    "title": "Agri-Clinic and Agri-Business Centres (ACABC)",
+    "description": "Provides self-employment opportunities to eligible agriculture graduates to support agricultural development and technology transfer.",
+    "link": "https://www.myscheme.gov.in/schemes/acabc",
+    "tags": ["Agriculture", "Employment", "Entrepreneurship"]
+  },
+  {
+    "title": "National Bamboo Mission",
+    "description": "Promotes the growth of the bamboo sector through an area-based, regionally differentiated strategy to increase income for farmers.",
+    "link": "https://www.myscheme.gov.in/schemes/nbm",
+    "tags": ["Agriculture", "Bamboo", "Rural Development"]
+  },
+  {
+    "title": "Rashtriya Krishi Vikas Yojana (RKVY)",
+    "description": "Provides states with flexibility and autonomy to plan and execute schemes that maximize returns to farmers based on local needs.",
+    "link": "https://www.myscheme.gov.in/schemes/rkvy",
+    "tags": ["Agriculture", "State-led", "Holistic Development"]
+  },
+  {
+    "title": "Kisan Credit Card (KCC)",
+    "description": "Provides adequate and timely credit support from the banking system for agricultural and other allied requirements.",
+    "link": "https://www.myscheme.gov.in/schemes/kcc",
+    "tags": ["Agriculture", "Credit", "Finance"]
+  },
+  {
+    "title": "e-NAM (National Agriculture Market)",
+    "description": "A pan-India electronic trading portal networking existing APMC mandis to create a unified national market for agricultural commodities.",
+    "link": "https://www.myscheme.gov.in/schemes/enam",
+    "tags": ["Agriculture", "Trading", "Marketing"]
+  },
+  {
+    "title": "PM Matsya Sampada Yojana",
+    "description": "A landmark scheme for the sustainable and responsible development of the fisheries sector in India.",
+    "link": "https://www.myscheme.gov.in/schemes/pmmsy",
+    "tags": ["Agriculture", "Fisheries", "Rural Economy"]
+  },
+  {
+    "title": "PM-KUSUM",
+    "description": "Financial support for installing solar pumps and grid-connected solar power plants to ensure energy security for farmers.",
+    "link": "https://www.myscheme.gov.in/schemes/pmkusum",
+    "tags": ["Agriculture", "Solar Energy", "Irrigation"]
+  },
+  {
+    "title": "Mission for Integrated Development of Horticulture (MIDH)",
+    "description": "A centrally sponsored scheme for the holistic growth of the horticulture sector including fruits, vegetables, and flowers.",
+    "link": "https://www.myscheme.gov.in/schemes/midh",
+    "tags": ["Agriculture", "Horticulture", "Development"]
+  },
+  {
+    "title": "National Food Security Mission (NFSM)",
+    "description": "Aimed at increasing the production of rice, wheat, pulses, coarse cereals, and commercial crops through area expansion and productivity enhancement.",
+    "link": "https://www.myscheme.gov.in/schemes/nfsm",
+    "tags": ["Agriculture", "Food Security", "Production"]
+  },
+  {
+    "title": "Animal Husbandry Infrastructure Development Fund (AHIDF)",
+    "description": "Incentivizes investments by entrepreneurs and MSMEs in dairy, meat processing, and animal feed plants.",
+    "link": "https://www.myscheme.gov.in/schemes/ahidf",
+    "tags": ["Agriculture", "Animal Husbandry", "Infrastructure"]
+  },
+  {
+    "title": "PM Formalisation of Micro food processing Enterprises (PMFME)",
+    "description": "Provides financial and technical support for the upgradation of micro food processing enterprises in rural areas.",
+    "link": "https://www.myscheme.gov.in/schemes/pmfme",
+    "tags": ["Agriculture", "Food Processing", "Rural Industry"]
+  },
+  {
+    "title": "Pradhan Mantri Annadata Aay Sanraksan Abhiyan (PM-AASHA)",
+    "description": "Ensures remunerative prices to farmers for their produce, focusing on oilseeds and pulses.",
+    "link": "https://www.myscheme.gov.in/schemes/pmaasha",
+    "tags": ["Agriculture", "Price Support", "Farmers"]
+  },
+  {
+    "title": "Interest Subvention Scheme (ISS) for Farmers",
+    "description": "Provides short-term crop loans up to Rs. 3 lakh at an effective interest rate of 4% per annum (after subvention).",
+    "link": "https://www.myscheme.gov.in/schemes/iss",
+    "tags": ["Agriculture", "Finance", "Loan"]
+  },
+  {
+    "title": "National Livestock Mission",
+    "description": "Focuses on sustainable development of the livestock sector, particularly poultry, piggery, and feed & fodder development.",
+    "link": "https://www.myscheme.gov.in/schemes/nlm",
+    "tags": ["Agriculture", "Livestock", "Rural Livelihood"]
+  }
+]

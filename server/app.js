@@ -3,11 +3,12 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import authRoutes from "./routes/authRoutes.js"; // corrected filename if needed, or keep existing auth.js if it was working
+import userRoutes from "./routes/userRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 import communityRoutes from "./routes/communityRoutes.js";
 import schemeRoutes from "./routes/schemeRoutes.js";
 import expertRoutes from "./routes/expertRoutes.js";
-import messageRoutes from "./routes/messageRoutes.js"; // keeping for chat messages if reused
+import messageRoutes from "./routes/messageRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import path from "path"; // Required for static serving
@@ -32,6 +33,7 @@ app.use(
 );
 
 // 🔗 API Routes
+app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/communities", communityRoutes);
 app.use("/api/schemes", schemeRoutes);

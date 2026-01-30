@@ -72,10 +72,48 @@ export default function Navbar() {
             </span>
           </div>
 
-          {/* CENTER: Navigation Pill */}
+          {/*                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-1 border border-gray-100 overflow-hidden dropdown-container">
+                  <div className="px-4 py-3 border-b border-gray-50 bg-gray-50/50">
+                    <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                  </div>
+                  
+                  <button
+                    onClick={() => {
+                      navigate('/profile');
+                      setIsProfileOpen(false);
+                    }}
+                    className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 flex items-center gap-2 transition-colors"
+                  >
+                    <User size={16} />
+                    My Profile
+                  </button>
+
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    Sign Out
+                  </button>
+                </div>avigation Pill */}
           <div className="hidden lg:flex items-center bg-gray-100/50 p-1.5 rounded-full border border-gray-100/50 absolute left-1/2 -translate-x-1/2">
              <NavItem to="/communities">Community</NavItem>
              <NavItem to="/schemes">Schemes</NavItem>
+             
+             {/* Admin Link (Only for authorized admin) */}
+             {user?.role === "admin" && (
+                <NavLink 
+                  to="/admin" 
+                  className={({ isActive }) => 
+                    `nav-item flex items-center gap-1.5 px-4 py-2 text-sm font-bold transition-colors duration-300 rounded-full hover:bg-gray-50
+                    ${isActive ? 'text-red-600 bg-red-50/50' : 'text-slate-600 hover:text-red-500'}`
+                  }
+                >
+                  🛡️ Admin
+                </NavLink>
+             )}
+
              {/* Tools Dropdown */}
              <div className="relative dropdown-container">
                 <button 

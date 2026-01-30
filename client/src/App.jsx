@@ -8,6 +8,7 @@ import { Toaster } from "react-hot-toast";
 import ChatbotPage from "./pages/ChatbotPage.jsx";
 import CropAnalysisPage from "./pages/CropAnalysisPage.jsx";
 import SchemesPage from "./pages/SchemesPage.jsx";
+import SchemeDetails from "./pages/SchemeDetails.jsx";
 import ExpertHelpPage from "./pages/ExpertHelpPage.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import CommunityPage from "./pages/CommunityPage.jsx";
@@ -17,36 +18,40 @@ import { NotificationProvider } from "./contexts/NotificationContext.jsx";
 import { LanguageProvider } from "./contexts/LanguageContext.jsx";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 
+import { useAuth } from "./contexts/AuthContext.jsx";
+
 // Protected Route Component
 function ProtectedRoute({ children }) {
-  const isLoggedIn = !!localStorage.getItem("token");
-  return isLoggedIn ? children : <Navigate to="/" replace />;
+  const { user, loading } = useAuth();
+  if (loading) return null; // Or a spinner
+  return user ? children : <Navigate to="/" replace />;
+}
+
+// Redirect Handler
+function RedirectHandler() {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return <Navigate to={user ? "/dashboard" : "/"} replace />;
+}
+
+// Admin Route Component
+function AdminRoute({ children }) {
+  const { user, loading } = useAuth();
+  
+  if (loading) return null;
+  
+  // If not logged in, go to login
+  if (!user) return <Navigate to="/" replace />;
+  
+  // If logged in but not admin, go to dashboard
+  if (user.role !== "admin") return <Navigate to="/dashboard" replace />;
+  
+  return children;
 }
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
-
-  // Listen for storage changes (when token is set/removed)
-  useEffect(() => {
-    const checkAuth = () => {
-      setIsLoggedIn(!!localStorage.getItem("token"));
-    };
-
-    // Check on mount
-    checkAuth();
-    
-    // Listen for storage events (works across tabs)
-    window.addEventListener("storage", checkAuth);
-    
-    // Listen for custom auth event (for same-tab updates)
-    window.addEventListener("auth-change", checkAuth);
-
-    return () => {
-      window.removeEventListener("storage", checkAuth);
-      window.removeEventListener("auth-change", checkAuth);
-    };
-  }, []);
-
+  // We don't need local auth state tracking here anymore 
+  // because ProtectedRoute/AdminRoute use useAuth() directly.
   return (
     <LanguageProvider>
       <AuthProvider>
@@ -86,11 +91,21 @@ export default function App() {
                <Route
                 path="admin"
                 element={
-                  <ProtectedRoute>
+                  <AdminRoute>
                     <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+              
+              <Route
+                path="profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
                   </ProtectedRoute>
                 }
               />
+
 
               <Route
                 path="profile"
@@ -133,6 +148,14 @@ export default function App() {
                 }
               />
               <Route
+                path="schemes/:id"
+                element={
+                  <ProtectedRoute>
+                    <SchemeDetails />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="expert-help"
                 element={
                   <ProtectedRoute>
@@ -145,7 +168,7 @@ export default function App() {
             {/* Redirect unknown routes */}
             <Route
               path="*"
-              element={<Navigate to={isLoggedIn ? "/dashboard" : "/"} replace />}
+              element={<RedirectHandler />}
             />
           </Routes>
 
