@@ -1,0 +1,28 @@
+﻿Query: {'fetched_at': {'$gte': datetime.datetime(2026, 1, 1, 22, 53, 17, 926187)}, 'demand_signals': {'$exists': True, '$ne': []}}
+Start date: 2026-01-01 22:53:17.926187
+Current date: 2026-01-31 22:53:17.926255
+
+Found 12 news items matching the query
+
+First 3 items:
+
+1. With inflation at record low of 0.3%, food ministry proposes lifting of export ban on wheat products - Times of India
+   Commodity: Wheat
+   Signals: ['export', 'inflation']
+   Sentiment: neutral
+   Fetched at: 2026-01-31 22:50:28.522000
+   URL: https://news.google.com/rss/articles/CBMi8wFBVV95cUxNcEoxd0FhMDdna2p4XzhCaXJmVGxra3gyYmgwRTBwODR1VkJwc2tTRW5PeGpmOTlpeFlBZ0wxcjEtRVR2bW0ybTFtd1JlMWotTGc2dDA1ZHU2bElyRDRjVHFsaTE4NEZvVllGc2tTODBucmJZekJGXzBCR09OczVLVkxmZFdnZlNoWHFrV0JINk0wREFNZXFIVHpRYll5Y2Uyc2xfZXF2V1ZvVkEwNVhpaGZSaktpQjFFT2hPdzI1aFAwRk9iQS1jNTl0YkR1Z3BRNGJlMlJraktCQlkwa0p2TnNaekFCT1lxMS15Q3JEaXVrTnfSAfgBQVVfeXFMTXVlVkpLWUZqZmRnWFprekd5WVBhcFpObnJQbl9tNjhkUURwYXptZk1KQW9GMlppRWV4cUItSHJLdDdJc1A2d1RKZzZSWXF0SnB2bXo3cDQ0SFFqWmhKSXRtNmlBVF90RGhrRElfWWF2RVIzLWo5TlRSaUpKbmNKMGJkRTBYczgwOVItcFlQWFhCS3RYbktYbWw1bzNkNl9Xb296RjBaWkJDeVN4U0Q3Zzd1SUc2OUVKTHc1NG5TdkxCWG5LTVdFMkowTmhxdlgyeElrd1RHbWxqS2FEMjdCRDZLRlRobzJ4dXVLOElFTEZTaWt5V3VPTjI?oc=5
+
+2. India proposes lifting 3 year wheat-product export ban amid record stocks - UkrAgroConsult
+   Commodity: Wheat
+   Signals: ['export']
+   Sentiment: bullish
+   Fetched at: 2026-01-31 22:50:28.522000
+   URL: https://news.google.com/rss/articles/CBMirgFBVV95cUxPMUVKajlXWDJBWW9Ya2RyRVJ5bkRJNUVTV3ZGRTdIY09LQllCTmFsRTlqYkVKRmVCdW5EaTg5OWs4OXN2ZXk1b1RjZ29VVlZJNWIydzROR1UyM2I0RkEwZ3pCb3ZKN0dZRGpOdWRERm1Ea05rYnhFMjc1Q2VWS0lHTHI2WEp3VjJiVGNnQ3BTUzlHbC1XOUZ5YVlKa0p4ZFNCaGFtZjd5V0pWRE9WaGc?oc=5
+
+3. North India cotton yarn gains as mills raise prices on export hopes - ALCHEMPro
+   Commodity: Cotton
+   Signals: ['export']
+   Sentiment: bullish
+   Fetched at: 2026-01-31 16:22:57.643000
+   URL: https://news.google.com/rss/articles/CBMi3gFBVV95cUxNVW1SVzBmb2J4UzhNR2hEcXF1N0k2M2NtZ1FKS0Vlc0ZPLUxFVlkzNXJsYUlHdU9pcnU2bWM1NHZMemxmY3VONFcwUnJ1TGp3VFlYOElBb195bkRFSmtFRllPOUxjUGFCbXRXNnVUNElwcUlWYVowblhsYjQ0WjVOZ21SRURvaTVOc1VkQVY3MkQ3bmgzREVyRW1XOHc2SUNKMUdFR1RFYmY2Q1VuMGxJdk9wZnBKdFJFVDVhX2VUZ1lYTU10MDY5U3NFMHhJUl90VDNyRWd5RXBYVzRhMXc?oc=5

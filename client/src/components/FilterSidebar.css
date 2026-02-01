@@ -1,0 +1,139 @@
+.filter-sidebar {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.filter-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.reset-filters {
+  background: none;
+  border: none;
+  color: #059669;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.reset-filters:hover {
+  color: #047857;
+}
+
+/* Filter Sections */
+.filter-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.filter-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.expand-icon {
+  color: #10b981;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #10b981;
+}
+
+/* Filter Options (Checkboxes) */
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 8px;
+  margin-top: 8px;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.filter-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #10b981;
+}
+
+.filter-checkbox span {
+  flex: 1;
+}
+
+.tag-count {
+  color: #6b7280;
+  font-size: 13px;
+  margin-left: auto;
+}
+
+/* Special Tags Section */
+.special-tags {
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.special-tags .filter-checkbox {
+  justify-content: space-between;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .filter-sidebar {
+    position: static;
+  }
+}

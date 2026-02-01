@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import HelpChatbot from "../components/HelpChatbot.jsx";
 import bgVideo from "../assets/Agri_Background1.mp4";
-import bgImg from "../assets/image.png";
+import bgImg from "../assets/Landing.png";
 
 const AppLayout = () => {
   return (
@@ -18,7 +18,7 @@ const AppLayout = () => {
 
       <div className="relative z-10">
         <Navbar />
-        <div className="pt-16">
+        <div className="">
           {/* Content will be rendered here */}
           <Outlet />
         </div>

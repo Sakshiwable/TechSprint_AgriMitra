@@ -1,10 +1,11 @@
 // src/pages/Auth.jsx
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Send, User, Mail, Lock, Eye, EyeOff, Sprout, Briefcase } from "lucide-react";
-import bgVideo from "../assets/background.mp4";
+import { Send, User, Mail, Lock, Eye, EyeOff, Sprout, Briefcase, Sparkles } from "lucide-react";
+import landing from "../assets/login.png";
+import gsap from "gsap";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -20,6 +21,45 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const authRef = useRef(null);
+  const formRef = useRef(null);
+
+  // GSAP Animations - Only run once on mount
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Set initial states
+      gsap.set(".auth-brand", { opacity: 0, y: -30 });
+      gsap.set(".auth-form", { opacity: 0, y: 30 });
+      gsap.set(".form-field", { opacity: 0, x: -20 });
+
+      // Animate in
+      gsap.to(".auth-brand", {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: "power3.out"
+      });
+      
+      gsap.to(".auth-form", {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        delay: 0.2,
+        ease: "power3.out"
+      });
+
+      gsap.to(".form-field", {
+        x: 0,
+        opacity: 1,
+        stagger: 0.05,
+        duration: 0.6,
+        delay: 0.4,
+        ease: "power2.out"
+      });
+    }, authRef);
+
+    return () => ctx.revert();
+  }, []); // Only run once on mount
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -51,7 +91,7 @@ export default function Auth() {
         ? {
             name: form.name,
             mobile: form.mobile,
-            email: form.email, // Optional, for admin check
+            email: form.email,
             password: form.password,
             role: form.role,
             state: form.state,
@@ -67,13 +107,15 @@ export default function Auth() {
       });
 
       localStorage.setItem("token", res.data.token);
-      // Trigger custom event to update auth state in App.jsx
       window.dispatchEvent(new Event("auth-change"));
       toast.success(
         isSignup ? "🎉 Signup successful!" : "✅ Login successful!"
       );
-      // Navigate to dashboard
-      navigate("/dashboard", { replace: true });
+      
+      // Small delay to ensure token is saved and auth state updates
+      setTimeout(() => {
+        navigate("/dashboard", { replace: true });
+      }, 100);
     } catch (err) {
       console.error("Auth error:", err.response?.data || err.message);
       toast.error(err.response?.data?.message || "Something went wrong.");
@@ -83,129 +125,162 @@ export default function Auth() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 py-8 overflow-y-auto">
- 
-      {/* subtle tint + blur overlay for readability */}
-      <div className="fixed inset-0 bg-gradient-to-br from-cyan-600/20 via-teal-500/12 to-white/10 -z-10" />
+    <div ref={authRef} className="relative h-screen flex items-center justify-center px-4 py-4 overflow-hidden">
+      {/* Background Image */}
+      <div className="fixed inset-0 -z-10">
+        <img
+          src={landing}
+          alt="Background"
+          className="absolute inset-0 w-full h-full object-cover "
+        />
+        {/* <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/40 via-green-500/30 to-emerald-700/40" /> */}
+      </div>
 
-      <div className="w-full max-w-2xl grid grid-cols-1 md:grid-cols-1 gap-3 items-center relative z-10">
-        {/* Illustration / Brand */}
-        <div className="hidden md:flex flex-row items-center gap-4 justify-center rounded-2xl p-3 bg-white/40 border border-cyan-100 shadow-xl backdrop-blur-sm h-20 ">
-          <div className="w-12 h-12 p-3 rounded-full bg-gradient-to-tr from-teal-500 to-cyan-500 flex items-center justify-center text-white shadow-2xl my-auto">
-            <Send size={40} />
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute top-20 left-20 w-72 h-72 bg-emerald-400/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-green-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+      </div>
+
+      <div className={`w-full ${isSignup ? 'max-w-5xl' : 'max-w-md'} relative z-10`}>
+        {/* Brand Header - Compact */}
+        <div
+          className="auth-brand flex flex-col md:flex-row items-center justify-center gap-3 mb-4"
+        >
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center text-white shadow-xl">
+            <Sprout size={24} className="fill-current" />
           </div>
-
-          <h1 className="text-2xl font-extrabold text-teal-700 mb-2">
-            TravelSync
-          </h1>
+          <div className="text-center md:text-left">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow-2xl">
+              Agri<span className="text-emerald-300">Mitra</span>
+            </h1>
+            <p className="text-emerald-100 text-xs md:text-sm mt-0.5">
+              AI-powered agriculture ecosystem
+            </p>
+          </div>
         </div>
 
         {/* Auth Form */}
-        <div className="bg-white/95 rounded-2xl p-6 md:p-8 shadow-2xl border border-cyan-100 backdrop-blur-sm max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between mb-6">
+        <div
+          ref={formRef}
+          className={`auth-form bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-emerald-100/50 opacity-100 ${
+            isSignup ? 'p-5 md:p-6' : 'p-6 md:p-8'
+          }`}
+        >
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-2xl font-extrabold text-teal-700">
+              <h2 className={`${isSignup ? 'text-2xl' : 'text-2xl md:text-3xl'} font-bold text-gray-800`}>
                 {isSignup ? "Create your account" : "Welcome back"}
               </h2>
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-xs text-emerald-600 mt-0.5">
                 {isSignup
-                  ? "Sign up to create groups and share live locations."
-                  : "Sign in to continue to TravelSync."}
+                  ? "Join AgriMitra to access AI-powered farming tools and connect with experts."
+                  : "Sign in to continue to AgriMitra."}
               </p>
             </div>
 
-            <div className="text-xs text-slate-400">
-              Secure · Fast · Private
+            <div className="hidden md:flex items-center gap-2 text-xs text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
+              <Sparkles size={10} />
+              <span>Secure · Fast · Private</span>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {isSignup && (
-              <label className="block">
-                <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
-                  <User size={14} className="mr-2 text-cyan-600" /> Full name
-                </div>
-                <input
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
-                  placeholder="Your full name"
-                />
-              </label>
-            )}
+          <form onSubmit={handleSubmit} className={isSignup ? "space-y-2.5" : "space-y-4"}>
+            {isSignup ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <label className="form-field block">
+                  <div className="flex items-center text-xs text-emerald-700 font-semibold mb-1.5">
+                    <User size={14} className="mr-1.5 text-emerald-600" /> Full name
+                  </div>
+                  <input
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 text-sm rounded-lg border-2 border-emerald-100 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                    placeholder="Your full name"
+                  />
+                </label>
 
-            <label className="block">
-              <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
-                <Mail size={14} className="mr-2 text-cyan-600" /> Mobile Number
+                <label className="form-field block">
+                  <div className="flex items-center text-xs text-emerald-700 font-semibold mb-1.5">
+                    <Mail size={14} className="mr-1.5 text-emerald-600" /> Mobile Number
+                  </div>
+                  <input
+                    name="mobile"
+                    type="tel"
+                    value={form.mobile}
+                    onChange={handleChange}
+                    required
+                    pattern="[0-9]{10}"
+                    className="w-full px-3 py-2 text-sm rounded-lg border-2 border-emerald-100 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                    placeholder="10-digit mobile number"
+                  />
+                </label>
+
+                <label className="form-field block">
+                  <div className="flex items-center text-xs text-emerald-700 font-semibold mb-1.5">
+                    <Mail size={14} className="mr-1.5 text-emerald-600" /> Email (Optional)
+                  </div>
+                  <input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 text-sm rounded-lg border-2 border-emerald-100 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                    placeholder="For admin access"
+                  />
+                </label>
               </div>
-              <input
-                name="mobile"
-                type="tel"
-                value={form.mobile}
-                onChange={handleChange}
-                required
-                pattern="[0-9]{10}"
-                className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
-                placeholder="10-digit mobile number"
-              />
-            </label>
-
-            {/* Admin Email (Hidden/Optional) - shown only if specific sequence or just let them upgrade later? 
-                Actually, the requirements say "make jadhavatharv215@gmail.com as a admin email".
-                So we should add an Email field too, but optional?
-                Let's double check requirement: "by usiing mobile number the login and signin shuold happen". 
-                "admin email ... as admin email". 
-                So maybe I should keep Email field for signup, but Login is Mobile?
-                Or just add Email as optional field in Signup.
-             */}
-            {isSignup && (
-              <label className="block">
-                <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
-                  <Mail size={14} className="mr-2 text-cyan-600" /> Email (Optional)
-                </div>
-                <input
-                  name="email"
-                  type="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
-                  placeholder="For admin access"
-                />
-              </label>
+            ) : (
+              <>
+                <label className="form-field block">
+                  <div className="flex items-center text-sm text-emerald-700 font-semibold mb-2">
+                    <Mail size={16} className="mr-2 text-emerald-600" /> Mobile Number
+                  </div>
+                  <input
+                    name="mobile"
+                    type="tel"
+                    value={form.mobile}
+                    onChange={handleChange}
+                    required
+                    pattern="[0-9]{10}"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-emerald-100 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                    placeholder="10-digit mobile number"
+                  />
+                </label>
+              </>
             )}
 
             {isSignup && (
               <>
-                 <label className="block">
-                  <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
-                    <User size={14} className="mr-2 text-cyan-600" /> State
-                  </div>
-                  <input
-                    name="state"
-                    value={form.state || ""}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
-                    placeholder="e.g. Maharashtra"
-                  />
-                </label>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <label className="block">
-                    <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <label className="form-field block">
+                    <div className="flex items-center text-xs text-emerald-700 font-semibold mb-1.5">
+                      <User size={14} className="mr-1.5 text-emerald-600" /> State
+                    </div>
+                    <input
+                      name="state"
+                      value={form.state || ""}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 text-sm rounded-lg border-2 border-emerald-100 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                      placeholder="e.g. Maharashtra"
+                    />
+                  </label>
+                  <label className="form-field block">
+                    <div className="flex items-center text-xs text-emerald-700 font-semibold mb-1.5">
                       District
                     </div>
                     <input
                       name="district"
                       value={form.district || ""}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                      className="w-full px-3 py-2 text-sm rounded-lg border-2 border-emerald-100 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                       placeholder="e.g. Pune"
                     />
                   </label>
-                   <label className="block">
-                    <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
+                  <label className="form-field block">
+                    <div className="flex items-center text-xs text-emerald-700 font-semibold mb-1.5">
                       Land Size (Acres)
                     </div>
                     <input
@@ -213,34 +288,34 @@ export default function Auth() {
                       type="number"
                       value={form.landSize || ""}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                      className="w-full px-3 py-2 text-sm rounded-lg border-2 border-emerald-100 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                       placeholder="e.g. 2.5"
                     />
                   </label>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <label className="block">
-                    <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <label className="form-field block">
+                    <div className="flex items-center text-xs text-emerald-700 font-semibold mb-1.5">
                       Crop Type
                     </div>
                     <input
                       name="cropType"
                       value={form.cropType || ""}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                      className="w-full px-3 py-2 text-sm rounded-lg border-2 border-emerald-100 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                       placeholder="e.g. Rice"
                     />
                   </label>
-                   <label className="block">
-                    <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
+                  <label className="form-field block">
+                    <div className="flex items-center text-xs text-emerald-700 font-semibold mb-1.5">
                       Category
                     </div>
                     <select
                       name="category"
                       value={form.category || ""}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                      className="w-full px-3 py-2 text-sm rounded-lg border-2 border-emerald-100 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                     >
                       <option value="">Select Category</option>
                       <option value="Small">Small Farmer</option>
@@ -256,11 +331,10 @@ export default function Auth() {
             )}
 
             {isSignup ? (
-              // Signup: Password fields side by side
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <label className="block">
-                  <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
-                    <Lock size={14} className="mr-2 text-cyan-600" /> Password
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label className="form-field block">
+                  <div className="flex items-center text-xs text-emerald-700 font-semibold mb-1.5">
+                    <Lock size={14} className="mr-1.5 text-emerald-600" /> Password
                   </div>
                   <div className="relative">
                     <input
@@ -269,25 +343,22 @@ export default function Auth() {
                       value={form.password}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 pr-12 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                      className="w-full px-3 py-2 pr-10 text-sm rounded-lg border-2 border-emerald-100 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                       placeholder="Create password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-600 transition"
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-emerald-400 hover:text-emerald-600 transition"
                     >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
                 </label>
 
-                <label className="block">
-                  <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
-                    <Lock size={14} className="mr-2 text-cyan-600" /> Confirm
+                <label className="form-field block">
+                  <div className="flex items-center text-xs text-emerald-700 font-semibold mb-1.5">
+                    <Lock size={14} className="mr-1.5 text-emerald-600" /> Confirm
                   </div>
                   <div className="relative">
                     <input
@@ -296,40 +367,34 @@ export default function Auth() {
                       value={form.confirmPassword}
                       onChange={handleChange}
                       required
-                      className={`w-full px-4 py-3 pr-12 rounded-xl border bg-white focus:outline-none focus:ring-2 ${
+                      className={`w-full px-3 py-2 pr-10 text-sm rounded-lg border-2 bg-white focus:outline-none focus:ring-2 transition ${
                         form.confirmPassword &&
                         form.password !== form.confirmPassword
-                          ? "border-red-300 focus:ring-red-200"
-                          : "border-cyan-100 focus:ring-cyan-200"
+                          ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                          : "border-emerald-100 focus:ring-emerald-500 focus:border-emerald-500"
                       }`}
-                      placeholder="Confirm"
+                      placeholder="Confirm password"
                     />
                     <button
                       type="button"
                       onClick={() =>
                         setShowConfirmPassword(!showConfirmPassword)
                       }
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-600 transition"
-                      aria-label={
-                        showConfirmPassword
-                          ? "Hide confirm password"
-                          : "Show confirm password"
-                      }
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-emerald-400 hover:text-emerald-600 transition"
                     >
                       {showConfirmPassword ? (
-                        <EyeOff size={18} />
+                        <EyeOff size={16} />
                       ) : (
-                        <Eye size={18} />
+                        <Eye size={16} />
                       )}
                     </button>
                   </div>
                 </label>
               </div>
             ) : (
-              // Login: Single password field
-              <label className="block">
-                <div className="flex items-center text-sm text-teal-700 font-medium mb-2">
-                  <Lock size={14} className="mr-2 text-cyan-600" /> Password
+              <label className="form-field block">
+                <div className="flex items-center text-sm text-emerald-700 font-semibold mb-2">
+                  <Lock size={16} className="mr-2 text-emerald-600" /> Password
                 </div>
                 <div className="relative">
                   <input
@@ -338,16 +403,13 @@ export default function Auth() {
                     value={form.password}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 pr-12 rounded-xl border border-cyan-100 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                    className="w-full px-4 py-3 pr-12 rounded-xl border-2 border-emerald-100 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                     placeholder="Enter your password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-600 transition"
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-400 hover:text-emerald-600 transition"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -356,30 +418,30 @@ export default function Auth() {
             )}
 
             {isSignup && (
-              <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="grid grid-cols-2 gap-2.5">
                 <div
                   onClick={() => setForm({ ...form, role: "farmer" })}
-                  className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center justify-center transition ${
+                  className={`cursor-pointer rounded-xl border-2 p-3 flex flex-col items-center justify-center transition-all hover:scale-105 ${
                     form.role === "farmer"
-                      ? "bg-teal-50 border-teal-500 ring-1 ring-teal-500"
-                      : "bg-white border-cyan-100 hover:bg-slate-50"
+                      ? "bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-500 ring-2 ring-emerald-200 shadow-md"
+                      : "bg-white border-emerald-100 hover:border-emerald-300 hover:bg-emerald-50"
                   }`}
                 >
-                  <Sprout size={24} className={form.role === "farmer" ? "text-teal-600" : "text-slate-400"} />
-                  <span className={`text-sm font-medium mt-2 ${form.role === "farmer" ? "text-teal-700" : "text-slate-500"}`}>
+                  <Sprout size={20} className={form.role === "farmer" ? "text-emerald-600" : "text-emerald-400"} />
+                  <span className={`text-xs font-semibold mt-1 ${form.role === "farmer" ? "text-emerald-700" : "text-gray-600"}`}>
                     Farmer
                   </span>
                 </div>
                 <div
                   onClick={() => setForm({ ...form, role: "expert" })}
-                  className={`cursor-pointer rounded-xl border p-3 flex flex-col items-center justify-center transition ${
+                  className={`cursor-pointer rounded-xl border-2 p-3 flex flex-col items-center justify-center transition-all hover:scale-105 ${
                     form.role === "expert"
-                      ? "bg-teal-50 border-teal-500 ring-1 ring-teal-500"
-                      : "bg-white border-cyan-100 hover:bg-slate-50"
+                      ? "bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-500 ring-2 ring-emerald-200 shadow-md"
+                      : "bg-white border-emerald-100 hover:border-emerald-300 hover:bg-emerald-50"
                   }`}
                 >
-                  <Briefcase size={24} className={form.role === "expert" ? "text-teal-600" : "text-slate-400"} />
-                  <span className={`text-sm font-medium mt-2 ${form.role === "expert" ? "text-teal-700" : "text-slate-500"}`}>
+                  <Briefcase size={20} className={form.role === "expert" ? "text-emerald-600" : "text-emerald-400"} />
+                  <span className={`text-xs font-semibold mt-1 ${form.role === "expert" ? "text-emerald-700" : "text-gray-600"}`}>
                     Expert
                   </span>
                 </div>
@@ -389,10 +451,10 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 rounded-full text-white font-semibold shadow-md transition ${
+              className={`w-full ${isSignup ? 'py-3' : 'py-3.5'} rounded-xl text-white font-bold shadow-lg transition-all hover:scale-105 ${
                 loading
-                  ? "opacity-70 cursor-not-allowed bg-gradient-to-r from-cyan-300 to-teal-300"
-                  : "bg-gradient-to-r from-teal-500 to-cyan-500 hover:brightness-105"
+                  ? "opacity-70 cursor-not-allowed bg-gradient-to-r from-emerald-300 to-green-300"
+                  : "bg-gradient-to-r from-emerald-500 to-green-600 hover:shadow-xl"
               }`}
             >
               {loading
@@ -403,10 +465,10 @@ export default function Auth() {
             </button>
           </form>
 
-          <div className="mt-4 flex items-center justify-between text-sm">
+          <div className={`${isSignup ? 'mt-4' : 'mt-5'} flex flex-col sm:flex-row items-center justify-between gap-3 ${isSignup ? 'text-xs' : 'text-sm'}`}>
             <button
               onClick={() => setIsSignup(!isSignup)}
-              className="text-cyan-600 hover:underline"
+              className="text-emerald-600 hover:text-emerald-700 font-semibold hover:underline transition"
             >
               {isSignup
                 ? "Already have an account? Sign in"
@@ -423,7 +485,7 @@ export default function Auth() {
                 });
                 toast("Demo credentials filled", { icon: "⚡️" });
               }}
-              className="text-slate-500 hover:text-slate-700"
+              className="text-emerald-500 hover:text-emerald-600 font-medium transition"
             >
               Quick demo
             </button>

@@ -1,385 +1,741 @@
-import React, { useLayoutEffect, useRef, useEffect } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, BarChart3, CloudRain, ShieldCheck, Sprout, TrendingUp, Users, Zap, Globe, Leaf, ChevronDown } from 'lucide-react';
-import bgImg from "../assets/image.png";
+import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Bot,
+  ScanLine,
+  Users,
+  TrendingUp,
+  Store,
+  Cloud,
+  BookOpen,
+  Shield,
+  Zap,
+  Globe,
+  BarChart3,
+  MessageSquare,
+  CheckCircle2,
+  ArrowRight,
+  Leaf,
+  Target,
+  Award,
+  Sparkles,
+  TrendingDown,
+  AlertCircle,
+  Sun,
+  Droplets,
+  Wind,
+  MapPin,
+  Smartphone,
+  Laptop,
+  Database,
+  Brain,
+  Heart,
+  Star,
+  PlayCircle
+} from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import landing from "../assets/Landing.png";
 
+// Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Dashboard() {
-  const containerRef = useRef(null);
+  const navigate = useNavigate();
   const heroRef = useRef(null);
-  
-  // Hero Parallax Logic
-  useEffect(() => {
-    const moveShapes = (e) => {
-      const { clientX, clientY } = e;
-      const xPos = (clientX / window.innerWidth - 0.5);
-      const yPos = (clientY / window.innerHeight - 0.5);
+  const aboutRef = useRef(null);
+  const featuresRef = useRef(null);
+  const howToUseRef = useRef(null);
+  const statsRef = useRef(null);
+  const benefitsRef = useRef(null);
+  const ctaRef = useRef(null);
 
-      gsap.to(".hero-shape", {
-        x: xPos * 50, 
-        y: yPos * 50,
-        duration: 1.5,
-        ease: "power2.out"
-      });
-      
-      gsap.to(".hero-content", {
-        x: xPos * -20, 
-        y: yPos * -20, 
-        duration: 1.5,
-        ease: "power2.out"
-      });
-    };
+  // Hero Animation
+  React.useLayoutEffect(() => {
+    let ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-    window.addEventListener("mousemove", moveShapes);
-    return () => window.removeEventListener("mousemove", moveShapes);
-  }, []);
-
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      
-      // 0. Scroll Indicator Animation
-      gsap.to(".scroll-indicator", {
-        y: 15,
-        repeat: -1,
-        yoyo: true,
-        ease: "power1.inOut",
-        duration: 1.5
-      });
-
-      // 1. Loader/Entry Animation
-      const tlEntry = gsap.timeline();
-      tlEntry.from(".hero-title-word", {
-        y: 120,
+      tl.from(".hero-title", {
+        y: 60,
         opacity: 0,
-        skewY: 10,
-        duration: 1.2,
-        stagger: 0.1,
-        ease: "power3.out"
+        duration: 1
       })
-      .from(".hero-sub", { opacity: 0, y: 30, duration: 1 }, "-=0.8")
-      .from(".hero-btn", { opacity: 0, y: 20, stagger: 0.1, duration: 0.8 }, "-=0.6")
-      .from(".hero-float", { scale: 0, opacity: 0, duration: 1, ease: "elastic.out(1, 0.5)" }, "-=0.4");
+        .from(
+          ".hero-subtitle",
+          {
+            y: 40,
+            opacity: 0,
+            duration: 0.8
+          },
+          "-=0.6"
+        )
+        .from(
+          ".hero-description",
+          {
+            y: 30,
+            opacity: 0,
+            duration: 0.8
+          },
+          "-=0.4"
+        )
+        .from(
+          ".nav-card",
+          {
+            y: 40,
+            opacity: 0,
+            stagger: 0.08,
+            duration: 0.8
+          },
+          "-=0.4"
+        )
+        .from(
+          ".hero-cta",
+          {
+            scale: 0.8,
+            opacity: 0,
+            duration: 0.6
+          },
+          "-=0.2"
+        );
+    }, heroRef);
 
-      // 2. Marquee Scroll
-      gsap.to(".marquee-inner", {
-        xPercent: -50,
-        ease: "none",
-        duration: 25,
-        repeat: -1
-      });
-
-      // 3. Horizontal Scroll Section with 3D Rotate
-      const sections = gsap.utils.toArray(".feature-card");
-      
-      gsap.to(sections, {
-        xPercent: -100 * (sections.length - 1),
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".horizontal-section",
-          pin: true,
-          scrub: 1,
-          snap: 1 / (sections.length - 1),
-          end: "+=3500" 
-        }
-      });
-      
-      sections.forEach((section) => {
-        gsap.to(section, {
-          rotateY: 8,
-          scale: 0.9,
-          scrollTrigger: {
-             trigger: ".horizontal-section",
-             start: "top bottom",
-             scrub: 1
-          }
-        });
-      });
-
-      // 4. Reveal "Impact" numbers
-      gsap.utils.toArray(".stat-item").forEach(item => {
-        gsap.from(item, {
-           scale: 0.8,
-           opacity: 0,
-           y: 50,
-           duration: 0.8,
-           ease: "power2.out",
-           scrollTrigger: {
-             trigger: item,
-             start: "top 85%"
-           }
-        });
-      });
-      
-      // 5. Image Zoom Parallax
-      gsap.to(".zoom-img", {
-        scale: 1.15,
-        y: 50,
-        scrollTrigger: {
-           trigger: ".zoom-section",
-           start: "top bottom",
-           end: "bottom top",
-           scrub: true
-        }
-      });
-
-    }, containerRef);
     return () => ctx.revert();
   }, []);
 
+  // Scroll Animations
+  useEffect(() => {
+    const sections = [
+      { ref: aboutRef, class: ".about-content" },
+      { ref: featuresRef, class: ".feature-card" },
+      { ref: howToUseRef, class: ".step-card" },
+      { ref: statsRef, class: ".stat-card" },
+      { ref: benefitsRef, class: ".benefit-card" },
+      { ref: ctaRef, class: ".cta-content" }
+    ];
+
+    sections.forEach(({ ref, class: className }) => {
+      if (ref.current) {
+        gsap.fromTo(
+          className,
+          {
+            y: 60,
+            opacity: 0
+          },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: ref.current,
+              start: "top 80%",
+              toggleActions: "play none none none"
+            }
+          }
+        );
+      }
+    });
+
+    // Animate numbers
+    const animateNumbers = () => {
+      const numbers = document.querySelectorAll(".stat-number");
+      numbers.forEach((num) => {
+        const target = parseInt(num.getAttribute("data-target"));
+        const duration = 2000;
+        const increment = target / (duration / 16);
+        let current = 0;
+
+        const updateNumber = () => {
+          current += increment;
+          if (current < target) {
+            num.textContent = Math.floor(current) + (num.getAttribute("data-suffix") || "");
+            requestAnimationFrame(updateNumber);
+          } else {
+            num.textContent = target + (num.getAttribute("data-suffix") || "");
+          }
+        };
+
+        ScrollTrigger.create({
+          trigger: num,
+          start: "top 80%",
+          onEnter: updateNumber,
+          once: true
+        });
+      });
+    };
+
+    animateNumbers();
+
+    return () => {
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    };
+  }, []);
+
   return (
-    // Transparent background to show AppLayout video
-    <div
-      ref={containerRef}
-      className="bg-transparent font-sans text-slate-900 overflow-x-hidden relative"
-    >
-      <style>{`
-        /* Global & Utility */
-        .glass-panel {
-          background: rgba(255, 255, 255, 0.7);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.4);
-          box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
-        }
-        
-        .hero-title-word { display: inline-block; }
+    <div className="bg-[#f4fdf8] min-h-screen">
+      {/* Hero Section */}
+      <section ref={heroRef} className="relative min-h-[92vh] rounded-[2.8rem] overflow-hidden mx-4 mt-4 pb-8">
+        {/* Background Image */}
+        <img
+          src={landing}
+          alt="AgriMitra"
+          className="absolute inset-0 w-full h-full object-cover  z-0"
+        />
 
-        /* Smooth Gradients */
-        .gradient-text {
-          background: linear-gradient(135deg, #166534 0%, #10b981 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-        
-        /* Text shadow for better readability over video */
-        .text-shadow-sm {
-           text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-      `}</style>
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#2d8c59]/80 to-[#1c7c54] z-10" />
 
-      {/* 1. HERO SECTION - Height adjusted to account for Navbar (pt-16 in AppLayout) */}
-      {/* min-h-[calc(100vh-4rem)] ensures it fits perfectly without scroll if navbar is 4rem (16) */}
-      <section
-        ref={heroRef}
-        className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center overflow-hidden"
-      >
-            {/* Background video (covers entire app) */}
-      <img
-        className="fixed inset-0 w-full bg-white  h-full object-cover -z-20"
-        src={bgImg}
-        aria-hidden="true"
-      />
-        <div className="hero-content relative z-10 text-center px-6 max-w-6xl mt-[-5vh]">
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-8 overflow-hidden">
-            <span className="hero-title-word text-6xl bg-clip-text bg-gradient-to-br from-green-700 to-emerald-500  md:text-9xl font-black text-transparent tracking-tighter  drop-shadow-sm">
-              SMART
-            </span>
-            <span className="hero-title-word text-6xl md:text-9xl font-black text-white tracking-tighter  drop-shadow-sm">
-              AGRICULTURE
-            </span>
-          </div>
-
-          <p className="hero-sub text-xl md:text-2xl text-green-700 font-medium max-w-3xl mx-auto leading-relaxed mb-12 text-shadow-sm bg-white/30 backdrop-blur-sm p-4 rounded-2xl inline-block border border-white/40">
-            Harness the power of{" "}
-            <span className="text-green-800 font-bold">AI</span> and{" "}
-            <span className="text-green-800 font-bold">Data</span> to cultivate
-            a smarter, more sustainable world.
-          </p>
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 z-5">
+          <div className="absolute top-20 left-20 w-72 h-72 bg-emerald-400/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-green-400/20 rounded-full blur-3xl animate-pulse delay-1000" />
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-70">
-          <span className="text-xs font-bold uppercase tracking-widest text-slate-900">
-            Scroll
-          </span>
-          <div className="scroll-indicator w-8 h-12 border-2 border-slate-900 rounded-full flex justify-center p-1">
-            <div className="w-1.5 h-1.5 bg-slate-900 rounded-full"></div>
+        {/* Content */}
+        <div className="relative z-20 min-h-full flex items-center justify-center md:justify-end px-4 md:px-8 py-8">
+          <div className="w-full md:w-[60%] lg:w-[55%] h-full my-32 pr-4 md:pr-8 lg:pr-20 pl-4 md:pl-10 text-center md:text-right flex flex-col items-center md:items-end">
+            <h1 className="hero-title text-5xl md:text-8xl font-extrabold text-white drop-shadow-2xl">
+              Agri<span className="text-emerald-300">Mitra</span>
+            </h1>
+
+            <p className="hero-subtitle mt-6 text-lg md:text-2xl text-white/90 max-w-xl leading-relaxed border-r-4 border-emerald-300 pr-6">
+              AI-powered agriculture ecosystem for farmers, markets, experts and real-time insights.
+            </p>
+
+            <p className="hero-description mt-4 text-base md:text-lg text-white/80 max-w-xl">
+              Empowering farmers with intelligent tools, market insights, and expert guidance to transform agriculture.
+            </p>
+
+     
+
+            {/* CTA Button */}
+            <button
+              onClick={() => navigate("/chatbot")}
+              className="hero-cta mt-8 px-8 py-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-bold rounded-full shadow-2xl hover:scale-105 transition-transform duration-300 flex items-center gap-2"
+            >
+              <PlayCircle size={20} />
+              Get Started Now
+            </button>
           </div>
         </div>
       </section>
 
-      {/* 2. INFINITE MARQUEE */}
-      <div className="py-10  bg-gradient-to-br from-green-700/50 to-emerald-500/50 backdrop-blur-md text-white overflow-hidden border-y border-slate-800 relative z-20 origin-left scale-105 shadow-2xl">
-        <div className="marquee-inner flex gap-12 text-5xl font-black uppercase tracking-widest whitespace-nowrap opacity-40">
-          <span>Chatbot</span> <span className="text-green-500">•</span>{" "}
-          <span>AI</span> <span className="text-green-500">•</span>{" "}
-          <span>Analytics</span> <span className="text-green-500">•</span>
-          <span>Community</span> <span className="text-green-500">•</span>{" "}
-          <span>Schemes</span> <span className="text-green-500">•</span>{" "}
-          <span>Expert Help</span> <span className="text-green-500">•</span>
-          <span>AI</span> <span className="text-green-500">•</span>{" "}
-          <span>AI</span> <span className="text-green-500">•</span>{" "}
-          <span>AI</span> <span className="text-green-500">•</span>
-        </div>
-      </div>
-
-      {/* 3. HORIZONTAL SCROLL FEATURE SHOWCASE */}
-      <section className="horizontal-section h-screen  backdrop-blur-sm overflow-hidden relative">
-        <div className="flex h-full items-center pl-[15vw] md:pl-[25vw]">
-          {/* Card 1: Analysis */}
-          <div className="feature-card w-[85vw] md:w-[60vw] h-[65vh] mr-16 bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col md:flex-row border border-slate-100 flex-shrink-0 relative group">
-            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Sprout size={200} />
-            </div>
-            <div className="w-full md:w-1/2 p-10 md:p-14 flex flex-col justify-center relative z-10">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-8 text-green-600 shadow-md">
-                <Sprout size={32} />
-              </div>
-              <h3 className="text-4xl font-bold mb-4 text-slate-800">
-                Crop Analysis
-              </h3>
-              <p className="text-lg text-slate-600 leading-relaxed mb-8">
-                Advanced computer vision algorithms detect diseases early.
-                Simply snap a photo, and get instant diagnosis with treatment
-                recommendations.
-              </p>
-              <button className="flex items-center gap-3 text-green-700 font-bold hover:gap-5 transition-all group-hover:text-green-600">
-                Learn more <ArrowRight size={20} />
-              </button>
-            </div>
-            <div className="w-full md:w-1/2 bg-green-50 relative overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?q=80&w=1968&auto=format&fit=crop"
-                className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-90 transition-transform duration-700 group-hover:scale-110"
-                alt="Crops"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-green-900/60 to-transparent"></div>
-            </div>
-          </div>
-
-          {/* Card 2: Market */}
-          <div className="feature-card w-[85vw] md:w-[60vw] h-[65vh] mr-16 bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col md:flex-row border border-slate-100 flex-shrink-0 relative group">
-            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-              <TrendingUp size={200} />
-            </div>
-            <div className="w-full md:w-1/2 p-10 md:p-14 flex flex-col justify-center relative z-10">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-8 text-blue-600 shadow-md">
-                <TrendingUp size={32} />
-              </div>
-              <h3 className="text-4xl font-bold mb-4 text-slate-800">
-                Direct Market
-              </h3>
-              <p className="text-lg text-slate-600 leading-relaxed mb-8">
-                Eliminate the middlemen. Connect directly with verified buyers.
-                Secure best prices for your produce with our transparent bidding
-                system.
-              </p>
-              <button className="flex items-center gap-3 text-blue-700 font-bold hover:gap-5 transition-all group-hover:text-blue-600">
-                View prices <ArrowRight size={20} />
-              </button>
-            </div>
-            <div className="w-full md:w-1/2 bg-blue-50 relative overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?q=80&w=2070&auto=format&fit=crop"
-                className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-90 transition-transform duration-700 group-hover:scale-110"
-                alt="Market"
-              />
-            </div>
-          </div>
-
-          {/* Card 3: Community */}
-          <div className="feature-card w-[85vw] md:w-[60vw] h-[65vh] mr-40 bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col md:flex-row border border-slate-100 flex-shrink-0 relative group">
-            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Users size={200} />
-            </div>
-            <div className="w-full md:w-1/2 p-10 md:p-14 flex flex-col justify-center relative z-10">
-              <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mb-8 text-yellow-600 shadow-md">
-                <Users size={32} />
-              </div>
-              <h3 className="text-4xl font-bold mb-4 text-slate-800">
-                Farmer Community
-              </h3>
-              <p className="text-lg text-slate-600 leading-relaxed mb-8">
-                Join thousands of farmers sharing knowledge. Discuss techniques,
-                solve problems together, and grow your network in specialized
-                forums.
-              </p>
-              <button className="flex items-center gap-3 text-yellow-700 font-bold hover:gap-5 transition-all group-hover:text-yellow-600">
-                Join now <ArrowRight size={20} />
-              </button>
-            </div>
-            <div className="w-full md:w-1/2 bg-yellow-50 relative overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1595841696677-6489ff3f8cd1?q=80&w=1974&auto=format&fit=crop"
-                className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-90 transition-transform duration-700 group-hover:scale-110"
-                alt="Community"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. IMPACT GRID (Semi-transparent background) */}
-      <section className="py-32 px-6 relative z-10">
-        <div className="container mx-auto max-w-7xl">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold mb-4 text-slate-900">
-              Measuring Our Impact
+      {/* About / Importance Section */}
+      <section ref={aboutRef} className="py-20 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="about-content text-center mb-16">
+            <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
+              Why <span className="text-emerald-600">AgriMitra</span> Matters
             </h2>
-            <div className="w-20 h-1 bg-green-500 mx-auto rounded-full"></div>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Agriculture is the backbone of our economy, yet farmers face numerous challenges. 
+              AgriMitra bridges the gap between traditional farming and modern technology, providing 
+              comprehensive solutions for sustainable agriculture.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="stat-item glass-panel p-10 rounded-[2.5rem] hover:bg-white/60 transition-colors text-center">
-              <Globe className="text-green-600 mb-6 mx-auto" size={48} />
-              <div className="text-5xl font-black text-slate-800 mb-2">
-                120<span className="text-green-600">+</span>
+          <div className="grid md:grid-cols-3 gap-8 mt-12">
+            {IMPORTANCE_ITEMS.map((item, idx) => (
+              <div
+                key={idx}
+                className="about-content bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-shadow duration-300 border border-emerald-100"
+              >
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-6`}>
+                  <item.icon size={32} className="text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-4">{item.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{item.description}</p>
               </div>
-              <div className="font-bold text-slate-500 uppercase tracking-wider text-sm">
-                Villages
-              </div>
-            </div>
-            <div className="stat-item glass-panel p-10 rounded-[2.5rem] hover:bg-white/60 transition-colors mt-8 lg:mt-12 text-center">
-              <Users className="text-blue-600 mb-6 mx-auto" size={48} />
-              <div className="text-5xl font-black text-slate-800 mb-2">
-                50k<span className="text-blue-600">+</span>
-              </div>
-              <div className="font-bold text-slate-500 uppercase tracking-wider text-sm">
-                Active Farmers
-              </div>
-            </div>
-            <div className="stat-item glass-panel p-10 rounded-[2.5rem] hover:bg-white/60 transition-colors text-center">
-              <BarChart3 className="text-yellow-600 mb-6 mx-auto" size={48} />
-              <div className="text-5xl font-black text-slate-800 mb-2">
-                $2M<span className="text-yellow-600">+</span>
-              </div>
-              <div className="font-bold text-slate-500 uppercase tracking-wider text-sm">
-                Volume
-              </div>
-            </div>
-            <div className="stat-item glass-panel p-10 rounded-[2.5rem] hover:bg-white/60 transition-colors mt-8 lg:mt-12 text-center">
-              <ShieldCheck className="text-purple-600 mb-6 mx-auto" size={48} />
-              <div className="text-5xl font-black text-slate-800 mb-2">
-                100<span className="text-purple-600">%</span>
-              </div>
-              <div className="font-bold text-slate-500 uppercase tracking-wider text-sm">
-                Secure
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* 6. CALL TO ACTION FOOTER REVEAL */}
-      <section className="h-[80vh]  text-white flex flex-col items-center justify-center text-center px-6 relative z-0 sticky bottom-0">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-        <div className="container mx-auto max-w-4xl relative z-10">
-          <div className="inline-block p-4 rounded-full bg-slate-800 border-2 border-slate-700 mb-8 animate-bounce delay-75">
-            <ChevronDown size={32} />
+      {/* Features Section */}
+      <section ref={featuresRef} className="py-20 px-4 md:px-8 bg-gradient-to-b from-white to-emerald-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
+              Powerful <span className="text-emerald-600">Features</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Everything you need to succeed in modern agriculture
+            </p>
           </div>
-          <h2 className="text-6xl md:text-8xl font-black mb-10 tracking-tighter">
-            Start <span className="text-green-500">Growing</span>
-            <br />
-            Smart Today.
-          </h2>
 
-          <button className="bg-green-500 text-slate-900 px-12 py-6 rounded-full text-xl font-bold hover:bg-green-400 hover:scale-105 transition-all shadow-xl shadow-green-900/20">
-            Join Communities Now
-          </button>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {FEATURES.map((feature, idx) => (
+              <div
+                key={idx}
+                className="feature-card bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border border-emerald-100 group"
+              >
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:rotate-6 transition-transform`}>
+                  <feature.icon size={28} className="text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">{feature.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed mb-4">{feature.description}</p>
+                <ul className="space-y-2">
+                  {feature.benefits.map((benefit, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />
+                      <span>{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => navigate(feature.path)}
+                  className="mt-4 w-full py-2 bg-emerald-50 text-emerald-600 rounded-lg font-semibold hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2"
+                >
+                  Explore <ArrowRight size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How to Use Section */}
+      <section ref={howToUseRef} className="py-20 px-4 md:px-8 bg-gradient-to-br from-emerald-600 to-green-700 m-5 rounded-3xl">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              How to Use<span className="text-emerald-200/70">  Agri<span className="text-emerald-300">Mitra</span></span>
+            </h2>
+            <p className="text-xl text-gray-100 max-w-3xl mx-auto">
+              Get started in minutes with our simple, intuitive platform
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {HOW_TO_USE_STEPS.map((step, idx) => (
+              <div
+                key={idx}
+                className="step-card relative bg-gradient-to-br from-emerald-50 to-green-50 rounded-3xl p-8 shadow-lg border border-emerald-200"
+              >
+                <div className="absolute -top-6 -left-6 w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-xl">
+                  {idx + 1}
+                </div>
+                <div className="mt-4">
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-4`}>
+                    <step.icon size={28} className="text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">{step.title}</h3>
+                  <p className="text-gray-600 leading-relaxed mb-4">{step.description}</p>
+                  <ul className="space-y-2">
+                    {step.actions.map((action, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                        <ArrowRight size={16} className="text-emerald-500 mt-1 flex-shrink-0" />
+                        <span>{action}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      
+
+      {/* Benefits Section */}
+      <section ref={benefitsRef} className="py-20 px-4 md:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-6xl font-bold text-gray-800 mb-6">
+              Key <span className="text-emerald-600">Benefits</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Why thousands of farmers trust AgriMitra
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {BENEFITS.map((benefit, idx) => (
+              <div
+                key={idx}
+                className="benefit-card bg-gradient-to-br from-emerald-50 to-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border-l-4 border-emerald-500"
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${benefit.color} flex items-center justify-center flex-shrink-0`}>
+                    <benefit.icon size={24} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">{benefit.title}</h3>
+                    <p className="text-gray-600 leading-relaxed">{benefit.description}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section ref={ctaRef} className="py-20 px-4 md:px-8 bg-gradient-to-br from-emerald-600 via-green-600 to-emerald-700 m-5 rounded-3xl">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="cta-content">
+            <Sparkles className="w-20 h-20 text-emerald-200 mx-auto mb-6" />
+            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+              Ready to Transform Your Agriculture?
+            </h2>
+            <p className="text-xl text-white/90 mb-8 leading-relaxed">
+              Join thousands of farmers who are already using AgriMitra to improve their yields, 
+              increase profits, and build sustainable farming practices.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+         
+              <button
+                onClick={() => navigate("/communities")}
+                className="px-8 py-4 bg-white text-emerald-600 font-bold rounded-full shadow-2xl hover:scale-105 transition-transform duration-300 flex items-center justify-center gap-2"
+              >
+                <Users size={20} />
+                Join Community
+              </button>
+            </div>
+          </div>
         </div>
       </section>
     </div>
   );
 }
+
+/* ---------------------------------- */
+/* Navigation Card Component */
+/* ---------------------------------- */
+
+// eslint-disable-next-line no-unused-vars
+const NavCard = ({ icon: Icon, label, color, onClick }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="nav-card relative overflow-hidden rounded-2xl bg-white/15 backdrop-blur-xl border border-white/20 p-4 md:p-5 flex flex-col items-center justify-center text-center transition-all duration-300 hover:scale-[1.07] hover:shadow-2xl group w-full aspect-square"
+    >
+      {/* Glow */}
+      <div
+        className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition bg-gradient-to-br ${color} blur-xl`}
+      />
+
+      <div className="relative z-10 flex flex-col items-center justify-center gap-2 md:gap-3 w-full h-full">
+        <div
+          className={`p-2 md:p-3 rounded-xl bg-gradient-to-br ${color} text-white shadow-lg group-hover:rotate-6 transition flex-shrink-0`}
+        >
+          <Icon size={24} className="md:w-7 md:h-7" />
+        </div>
+
+        <span className="text-white font-semibold text-xs md:text-sm tracking-wide break-words leading-tight">
+          {label}
+        </span>
+      </div>
+    </button>
+  );
+};
+
+/* ---------------------------------- */
+/* Navigation Items */
+/* ---------------------------------- */
+
+const NAV_ITEMS = [
+  {
+    icon: Users,
+    label: "Community",
+    path: "/communities",
+    color: "from-yellow-400 to-orange-500"
+  },
+  {
+    icon: BookOpen,
+    label: "Gov Schemes",
+    path: "/gov-schemes",
+    color: "from-blue-400 to-indigo-600"
+  },
+  {
+    icon: Bot,
+    label: "AI Assistant",
+    path: "/chatbot",
+    color: "from-emerald-400 to-green-600"
+  },
+  {
+    icon: ScanLine,
+    label: "Crop Analysis",
+    path: "/crop-analysis",
+    color: "from-green-400 to-lime-600"
+  },
+  {
+    icon: Users,
+    label: "Expert Help",
+    path: "/expert-help",
+    color: "from-purple-400 to-fuchsia-600"
+  },
+  {
+    icon: TrendingUp,
+    label: "Market Prices",
+    path: "/market-prices",
+    color: "from-orange-400 to-red-500"
+  },
+  {
+    icon: Store,
+    label: "Marketplace",
+    path: "/marketplace",
+    color: "from-rose-400 to-pink-600"
+  },
+  {
+    icon: Cloud,
+    label: "Climate Analysis",
+    path: "/climate-change",
+    color: "from-sky-400 to-cyan-600"
+  }
+];
+
+/* ---------------------------------- */
+/* Importance Items */
+/* ---------------------------------- */
+
+const IMPORTANCE_ITEMS = [
+  {
+    icon: Target,
+    title: "Addressing Real Challenges",
+    description: "Farmers face unpredictable weather, market volatility, and limited access to expert knowledge. AgriMitra provides solutions for all these challenges.",
+    color: "from-red-400 to-pink-500"
+  },
+  {
+    icon: Leaf,
+    title: "Sustainable Agriculture",
+    description: "Promote eco-friendly farming practices with AI-powered recommendations that balance productivity with environmental conservation.",
+    color: "from-green-400 to-emerald-500"
+  },
+  {
+    icon: TrendingUp,
+    title: "Economic Empowerment",
+    description: "Help farmers maximize profits through real-time market insights, price predictions, and direct marketplace access.",
+    color: "from-blue-400 to-indigo-500"
+  }
+];
+
+/* ---------------------------------- */
+/* Features */
+/* ---------------------------------- */
+
+const FEATURES = [
+  {
+    icon: Bot,
+    title: "AI Assistant",
+    description: "Get instant answers to your farming questions with our intelligent chatbot.",
+    color: "from-emerald-400 to-green-600",
+    path: "/chatbot",
+    benefits: [
+      "24/7 instant support",
+      "Crop-specific advice",
+      "Disease identification",
+      "Best practices guidance"
+    ]
+  },
+  {
+    icon: ScanLine,
+    title: "Crop Analysis",
+    description: "Analyze your crops with AI-powered image recognition and get detailed insights.",
+    color: "from-green-400 to-lime-600",
+    path: "/crop-analysis",
+    benefits: [
+      "Disease detection",
+      "Growth monitoring",
+      "Yield prediction",
+      "Treatment recommendations"
+    ]
+  },
+  {
+    icon: TrendingUp,
+    title: "Market Prices",
+    description: "Real-time market prices and price predictions to help you sell at the right time.",
+    color: "from-orange-400 to-red-500",
+    path: "/market-prices",
+    benefits: [
+      "Live price updates",
+      "Price forecasting",
+      "Market trends",
+      "Best time to sell"
+    ]
+  },
+  {
+    icon: Store,
+    title: "Marketplace",
+    description: "Buy and sell agricultural products directly with other farmers and buyers.",
+    color: "from-rose-400 to-pink-600",
+    path: "/marketplace",
+    benefits: [
+      "Direct trading",
+      "No middlemen",
+      "Secure transactions",
+      "Wide network"
+    ]
+  },
+  {
+    icon: Users,
+    title: "Community",
+    description: "Connect with fellow farmers, share experiences, and learn from each other.",
+    color: "from-yellow-400 to-orange-500",
+    path: "/communities",
+    benefits: [
+      "Farmer networks",
+      "Knowledge sharing",
+      "Group discussions",
+      "Local support"
+    ]
+  },
+  {
+    icon: BookOpen,
+    title: "Gov Schemes",
+    description: "Discover and apply for government schemes and subsidies tailored for farmers.",
+    color: "from-blue-400 to-indigo-600",
+    path: "/gov-schemes",
+    benefits: [
+      "Scheme discovery",
+      "Eligibility check",
+      "Application guide",
+      "Status tracking"
+    ]
+  },
+  {
+    icon: Users,
+    title: "Expert Help",
+    description: "Consult with agricultural experts for personalized advice and solutions.",
+    color: "from-purple-400 to-fuchsia-600",
+    path: "/expert-help",
+    benefits: [
+      "Expert consultations",
+      "Personalized advice",
+      "Problem solving",
+      "Certified professionals"
+    ]
+  },
+  {
+    icon: Cloud,
+    title: "Climate Analysis",
+    description: "Weather forecasts, climate data, and alerts to plan your farming activities.",
+    color: "from-sky-400 to-cyan-600",
+    path: "/climate-change",
+    benefits: [
+      "Weather forecasts",
+      "Climate alerts",
+      "Rain predictions",
+      "Planning tools"
+    ]
+  }
+];
+
+/* ---------------------------------- */
+/* How to Use Steps */
+/* ---------------------------------- */
+
+const HOW_TO_USE_STEPS = [
+  {
+    icon: Smartphone,
+    title: "Sign Up & Setup",
+    description: "Create your account in minutes and set up your profile with your farming details.",
+    color: "from-blue-400 to-indigo-500",
+    actions: [
+      "Register with email or phone",
+      "Complete your profile",
+      "Add your location and crops",
+      "Set your preferences"
+    ]
+  },
+  {
+    icon: Zap,
+    title: "Explore Features",
+    description: "Navigate through our comprehensive features and find what you need.",
+    color: "from-yellow-400 to-orange-500",
+    actions: [
+      "Browse the dashboard",
+      "Try the AI assistant",
+      "Check market prices",
+      "Join communities"
+    ]
+  },
+  {
+    icon: Target,
+    title: "Start Using",
+    description: "Begin using AgriMitra to improve your farming practices and increase yields.",
+    color: "from-emerald-400 to-green-600",
+    actions: [
+      "Ask questions to AI",
+      "Upload crop images",
+      "Monitor market trends",
+      "Connect with experts"
+    ]
+  }
+];
+
+/* ---------------------------------- */
+/* Statistics */
+/* ---------------------------------- */
+
+const STATISTICS = [
+  {
+    icon: Users,
+    value: 10000,
+    suffix: "+",
+    label: "Active Farmers"
+  },
+  {
+    icon: BarChart3,
+    value: 50,
+    suffix: "%",
+    label: "Yield Increase"
+  },
+  {
+    icon: TrendingUp,
+    value: 30,
+    suffix: "%",
+    label: "Profit Boost"
+  },
+  {
+    icon: Award,
+    value: 500,
+    suffix: "+",
+    label: "Expert Consultations"
+  }
+];
+
+/* ---------------------------------- */
+/* Benefits */
+/* ---------------------------------- */
+
+const BENEFITS = [
+  {
+    icon: Brain,
+    title: "AI-Powered Insights",
+    description: "Leverage artificial intelligence to get personalized recommendations for your crops and farming practices.",
+    color: "from-purple-400 to-fuchsia-500"
+  },
+  {
+    icon: Globe,
+    title: "Real-Time Data",
+    description: "Access up-to-date market prices, weather forecasts, and agricultural news in real-time.",
+    color: "from-blue-400 to-cyan-500"
+  },
+  {
+    icon: Shield,
+    title: "Secure & Reliable",
+    description: "Your data is protected with enterprise-grade security. We prioritize your privacy and safety.",
+    color: "from-green-400 to-emerald-500"
+  },
+  {
+    icon: MessageSquare,
+    title: "Expert Support",
+    description: "Get help from certified agricultural experts whenever you need guidance or solutions.",
+    color: "from-orange-400 to-red-500"
+  },
+  {
+    icon: Database,
+    title: "Comprehensive Database",
+    description: "Access a vast database of government schemes, crop information, and agricultural resources.",
+    color: "from-indigo-400 to-purple-500"
+  },
+  {
+    icon: Heart,
+    title: "Community Driven",
+    description: "Join a thriving community of farmers sharing knowledge, experiences, and supporting each other.",
+    color: "from-pink-400 to-rose-500"
+  }
+];

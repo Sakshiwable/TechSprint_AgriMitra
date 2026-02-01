@@ -7,12 +7,17 @@ import EditProfile from "./pages/EditProfile.jsx";
 import { Toaster } from "react-hot-toast";
 import ChatbotPage from "./pages/ChatbotPage.jsx";
 import CropAnalysisPage from "./pages/CropAnalysisPage.jsx";
-import SchemesPage from "./pages/SchemesPage.jsx";
-import SchemeDetails from "./pages/SchemeDetails.jsx";
+
+import GovSchemesPage from "./pages/GovSchemesPage.jsx";
+import SchemeDetailPage from "./pages/SchemeDetailPage.jsx";
 import ExpertHelpPage from "./pages/ExpertHelpPage.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import CommunityPage from "./pages/CommunityPage.jsx";
 import RequestCommunity from "./pages/RequestCommunity.jsx";
+import MarketPricesPage from "./pages/MarketPricesPage.jsx";
+import MarketplacePage from "./pages/MarketplacePage.jsx";
+import CreateListingPage from "./pages/CreateListingPage.jsx";
+import ClimateChangePage from "./pages/ClimateChangePage.jsx";
 import AppLayout from "./AppLayout/applayout.jsx";
 import { NotificationProvider } from "./contexts/NotificationContext.jsx";
 import { LanguageProvider } from "./contexts/LanguageContext.jsx";
@@ -139,27 +144,66 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="schemes"
-                element={
-                  <ProtectedRoute>
-                    <SchemesPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="schemes/:id"
-                element={
-                  <ProtectedRoute>
-                    <SchemeDetails />
-                  </ProtectedRoute>
-                }
-              />
+
               <Route
                 path="expert-help"
                 element={
                   <ProtectedRoute>
                     <ExpertHelpPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Market Intelligence & Direct Market Access */}
+              <Route
+                path="market-prices"
+                element={
+                  <ProtectedRoute>
+                    <MarketPricesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="marketplace"
+                element={
+                  <ProtectedRoute>
+                    <MarketplacePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="create-listing"
+                element={
+                  <ProtectedRoute>
+                    <CreateListingPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Government Schemes */}
+              <Route
+                path="gov-schemes"
+                element={
+                  <ProtectedRoute>
+                    <GovSchemesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="gov-schemes/:id"
+                element={
+                  <ProtectedRoute>
+                    <SchemeDetailPage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Climate & Weather */}
+              <Route
+                path="climate-change"
+                element={
+                  <ProtectedRoute>
+                    <ClimateChangePage />
                   </ProtectedRoute>
                 }
               />
@@ -172,7 +216,7 @@ export default function App() {
             />
           </Routes>
 
-          <Toaster position="top-center" reverseOrder={false} />
+          <Toaster position="top-right" reverseOrder={false} />
         </NotificationProvider>
       </AuthProvider>
     </LanguageProvider>
