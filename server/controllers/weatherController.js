@@ -1,4 +1,5 @@
 import WeatherData from '../models/WeatherData.js';
+import translationOrchestrator from '../services/translationOrchestrator.js';
 
 // @desc    Get current weather for a state
 // @route   GET /api/weather/state/:state
@@ -6,6 +7,7 @@ import WeatherData from '../models/WeatherData.js';
 export const getWeatherByState = async (req, res) => {
     try {
         const { state } = req.params;
+        const targetLang = req.userLanguage || 'en';
         
         // Get most recent weather data for the state
         const weatherData = await WeatherData.findOne({ state })
@@ -18,9 +20,36 @@ export const getWeatherByState = async (req, res) => {
             });
         }
         
+        let data = weatherData.toObject();
+        
+        // Translate weather data if not English
+        if (targetLang !== 'en') {
+            // Translate weather description
+            if (weatherData.weather_description) {
+                const translatedDesc = await translationOrchestrator.translateContent(
+                    weatherData.weather_description,
+                    targetLang,
+                    'weather_description',
+                    `weather_${weatherData.state}_desc`
+                );
+                data.weather_description = translatedDesc.text;
+            }
+            
+            // Translate impact analysis
+            if (weatherData.impact_analysis) {
+                const translatedImpact = await translationOrchestrator.translateContent(
+                    weatherData.impact_analysis,
+                    targetLang,
+                    'weather_impact',
+                    `weather_${weatherData.state}_impact`
+                );
+                data.impact_analysis = translatedImpact.text;
+            }
+        }
+        
         res.json({
             success: true,
-            data: weatherData
+            data: data
         });
     } catch (error) {
         res.status(500).json({

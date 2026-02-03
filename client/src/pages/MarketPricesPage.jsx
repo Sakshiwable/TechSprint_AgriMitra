@@ -3,9 +3,11 @@ import axios from 'axios';
 import { RefreshCw, Download, Filter, Search } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../hooks/useTranslation';
 
 const MarketPricesTablePage = () => {
     const { language } = useLanguage();
+    const { t } = useTranslation();
     const [allPrices, setAllPrices] = useState([]);
     const [filteredPrices, setFilteredPrices] = useState([]);
     const [selectedState, setSelectedState] = useState('');
@@ -157,8 +159,8 @@ const MarketPricesTablePage = () => {
             <div className="container mx-auto px-4 py-6">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg p-6 mb-6 shadow-lg">
-                    <h1 className="text-3xl font-bold mb-2">e-NAM Mandis Trade Details</h1>
-                    <p className="text-green-50">Real-time market prices across India - Maharashtra Priority</p>
+                    <h1 className="text-3xl font-bold mb-2">{t('marketPrices')}</h1>
+                    <p className="text-green-50">{t('realTimeMarketPrices')}</p>
                 </div>
 
                 {/* Filter Panel */}
@@ -166,7 +168,7 @@ const MarketPricesTablePage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
                         {/* State */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1.5">State</label>
+                            <label className="block text-sm font-bold text-gray-700 mb-1.5">{t('state')}</label>
                             <select
                                 value={selectedState}
                                 onChange={(e) => {
@@ -175,38 +177,38 @@ const MarketPricesTablePage = () => {
                                 }}
                                 className="w-full p-2 border-2 border-green-400 rounded bg-white text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
                             >
-                                {states.map(s => <option key={s} value={s}>{s}</option>)}
+                                {states.map(s => <option key={s} value={s}>{s === 'All' ? t('all') : s}</option>)}
                             </select>
                         </div>
 
                         {/* APMC */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1.5">APMC</label>
+                            <label className="block text-sm font-bold text-gray-700 mb-1.5">{t('apmc')}</label>
                             <select
                                 value={selectedAPMC}
                                 onChange={(e) => setSelectedAPMC(e.target.value)}
                                 disabled={!selectedState || selectedState === 'All'}
                                 className="w-full p-2 border-2 border-green-400 rounded bg-white text-sm focus:ring-2 focus:ring-green-500 focus:outline-none disabled:bg-gray-100"
                             >
-                                {apmcs.map(a => <option key={a} value={a}>{a}</option>)}
+                                {apmcs.map(a => <option key={a} value={a}>{a === 'All' ? t('all') : a}</option>)}
                             </select>
                         </div>
 
                         {/* Commodity */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1.5">Commodity</label>
+                            <label className="block text-sm font-bold text-gray-700 mb-1.5">{t('commodity')}</label>
                             <select
                                 value={selectedCommodity}
                                 onChange={(e) => setSelectedCommodity(e.target.value)}
                                 className="w-full p-2 border-2 border-green-400 rounded bg-white text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
                             >
-                                {commodities.map(c => <option key={c} value={c}>{c}</option>)}
+                                {commodities.map(c => <option key={c} value={c}>{c === 'All' ? t('all') : c}</option>)}
                             </select>
                         </div>
 
                         {/* From Date */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1.5">From date</label>
+                            <label className="block text-sm font-bold text-gray-700 mb-1.5">{t('fromDate')}</label>
                             <input
                                 type="date"
                                 value={fromDate}
@@ -217,7 +219,7 @@ const MarketPricesTablePage = () => {
 
                         {/* To Date */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1.5">To date</label>
+                            <label className="block text-sm font-bold text-gray-700 mb-1.5">{t('toDate')}</label>
                             <input
                                 type="date"
                                 value={toDate}
@@ -234,7 +236,7 @@ const MarketPricesTablePage = () => {
                                 className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition"
                             >
                                 <RefreshCw className="w-4 h-4" />
-                                Refresh
+                                {t('refresh')}
                             </button>
                         </div>
                     </div>
@@ -246,7 +248,7 @@ const MarketPricesTablePage = () => {
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                                 <input
                                     type="text"
-                                    placeholder="Search commodity, state, or market..."
+                                    placeholder={t('searchCommodity')}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="w-full pl-10 pr-4 py-2 border-2 border-green-400 rounded text-sm focus:ring-2 focus:ring-green-500 focus:outline-none"
@@ -259,7 +261,7 @@ const MarketPricesTablePage = () => {
                             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition"
                         >
                             <Download className="w-4 h-4" />
-                            Export CSV
+                            {t('exportCSV')}
                         </button>
                         
                         {(selectedState || selectedCommodity || selectedAPMC || fromDate || toDate || searchTerm) && (
@@ -273,8 +275,8 @@ const MarketPricesTablePage = () => {
                     </div>
 
                     <div className="mt-3 text-sm text-gray-600">
-                        <span className="font-medium">Last Updated:</span> {formatTimeSince(lastUpdated)} | 
-                        <span className="ml-2 font-medium">Showing:</span> {filteredPrices.length} of {allPrices.length} records
+                        <span className="font-medium">{t('lastUpdated')}:</span> {formatTimeSince(lastUpdated)} | 
+                        <span className="ml-2 font-medium">{t('showing')}:</span> {filteredPrices.length} of {allPrices.length} {t('records')}
                     </div>
                 </div>
 

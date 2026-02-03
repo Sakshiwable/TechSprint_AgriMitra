@@ -59,7 +59,7 @@ export const getMySchemes = async (req, res) => {
                         const translatedName = await translationOrchestrator.translateContent(
                             scheme.schemeName,
                             targetLang,
-                            'scheme_name',
+                            'scheme',
                             `${scheme._id}_name`
                         );
                         schemeObj.schemeName = translatedName.text;
@@ -70,14 +70,43 @@ export const getMySchemes = async (req, res) => {
                         const translatedDesc = await translationOrchestrator.translateContent(
                             scheme.description,
                             targetLang,
-                            'scheme_description',
+                            'scheme',
                             `${scheme._id}_desc`
                         );
                         schemeObj.description = translatedDesc.text;
-                        schemeObj._translationMeta = {
-                            confidence: translatedDesc.confidence,
-                            source: translatedDesc.source
-                        };
+                    }
+                    
+                    // Translate benefits if exists
+                    if (scheme.benefits) {
+                        const translatedBenefits = await translationOrchestrator.translateContent(
+                            scheme.benefits,
+                            targetLang,
+                            'scheme',
+                            `${scheme._id}_benefits`
+                        );
+                        schemeObj.benefits = translatedBenefits.text;
+                    }
+                    
+                    // Translate eligibility if exists
+                    if (scheme.eligibility) {
+                        const translatedEligibility = await translationOrchestrator.translateContent(
+                            scheme.eligibility,
+                            targetLang,
+                            'scheme',
+                            `${scheme._id}_eligibility`
+                        );
+                        schemeObj.eligibility = translatedEligibility.text;
+                    }
+                    
+                    // Translate how to apply if exists
+                    if (scheme.howToApply) {
+                        const translatedHowToApply = await translationOrchestrator.translateContent(
+                            scheme.howToApply,
+                            targetLang,
+                            'scheme',
+                            `${scheme._id}_howToApply`
+                        );
+                        schemeObj.howToApply = translatedHowToApply.text;
                     }
                     
                     return schemeObj;

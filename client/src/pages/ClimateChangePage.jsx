@@ -7,8 +7,10 @@ import {
     MapPin, Activity
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import { useTranslation } from '../hooks/useTranslation';
 
 const ClimateChangePage = () => {
+    const { t } = useTranslation();
     const [weatherData, setWeatherData] = useState([]);
     const [climateNews, setClimateNews] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -69,13 +71,13 @@ const ClimateChangePage = () => {
                     >
                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full text-blue-700 text-sm font-semibold mb-4">
                             <Leaf className="w-4 h-4" />
-                            Climate Intelligence for Agriculture
+                            {t('climateIntelligence')}
                         </div>
                         <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-                            जलवायु परिवर्तन विश्लेषण
+                            {t('climateAnalysis')}
                         </h1>
                         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                            Real-time climate data, seasonal patterns, and agricultural impact analysis
+                            {t('realTimeClimateData')}
                         </p>
                     </motion.div>
                 </div>
@@ -95,7 +97,7 @@ const ClimateChangePage = () => {
                                         : 'bg-white text-gray-600 hover:bg-gray-50 border'
                                 }`}
                             >
-                                {state}
+                                {state === 'All' ? t('all') : state}
                             </button>
                         ))}
                     </div>
@@ -111,7 +113,7 @@ const ClimateChangePage = () => {
                         <section className="mb-12">
                             <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                                 <Cloud className="w-6 h-6 text-blue-600" />
-                                Current Weather Conditions
+                                {t('currentWeatherConditions')}
                             </h2>
                             
                             {filteredWeather.length > 0 ? (
@@ -139,7 +141,7 @@ const ClimateChangePage = () => {
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center gap-2 text-gray-600">
                                                         <ThermometerSun className="w-5 h-5" />
-                                                        <span className="text-sm">Temperature</span>
+                                                        <span className="text-sm">{t('temperature')}</span>
                                                     </div>
                                                     <span className="text-2xl font-bold text-gray-800">
                                                         {weather.temperature}°C
@@ -149,7 +151,7 @@ const ClimateChangePage = () => {
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center gap-2 text-gray-600">
                                                         <Droplets className="w-5 h-5" />
-                                                        <span className="text-sm">Humidity</span>
+                                                        <span className="text-sm">{t('humidity')}</span>
                                                     </div>
                                                     <span className="text-lg font-semibold text-gray-700">
                                                         {weather.humidity}%
@@ -160,7 +162,7 @@ const ClimateChangePage = () => {
                                                     <div className="flex items-center justify-between">
                                                         <div className="flex items-center gap-2 text-gray-600">
                                                             <CloudRain className="w-5 h-5" />
-                                                            <span className="text-sm">Rainfall</span>
+                                                            <span className="text-sm">{t('rainfall')}</span>
                                                         </div>
                                                         <span className="text-lg font-semibold text-blue-700">
                                                             {weather.rainfall_1h}mm
@@ -174,7 +176,9 @@ const ClimateChangePage = () => {
                                                             <div className="flex items-center gap-2 mb-2">
                                                                 <Activity className="w-4 h-4" />
                                                                 <span className="text-xs font-bold uppercase">
-                                                                    {weather.impact_analysis.overall_impact} Impact
+                                                                    {weather.impact_analysis.overall_impact === 'negative' ? t('negativeImpact') : 
+                                                                     weather.impact_analysis.overall_impact === 'positive' ? t('positiveImpact') : 
+                                                                     weather.impact_analysis.overall_impact} {t('impact')}
                                                                 </span>
                                                             </div>
                                                             {weather.impact_analysis.factors && weather.impact_analysis.factors.length > 0 && (
@@ -188,7 +192,7 @@ const ClimateChangePage = () => {
                                             </div>
 
                                             <p className="text-xs text-gray-400 mt-4">
-                                                Updated: {new Date(weather.fetched_at).toLocaleString('en-IN')}
+                                                {t('updated')}: {new Date(weather.fetched_at).toLocaleString('en-IN')}
                                             </p>
                                         </motion.div>
                                     ))}
@@ -196,7 +200,7 @@ const ClimateChangePage = () => {
                             ) : (
                                 <div className="bg-white rounded-xl p-8 text-center text-gray-500">
                                     <Cloud className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                                    <p>No weather data available for selected state</p>
+                                    <p>{t('noWeatherData')}</p>
                                 </div>
                             )}
                         </section>
@@ -205,7 +209,7 @@ const ClimateChangePage = () => {
                         <section className="mb-12">
                             <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                                 <Newspaper className="w-6 h-6 text-blue-600" />
-                                Climate-Related Agricultural News
+                                {t('climateNews')}
                             </h2>
 
                             {climateNews.length > 0 ? (
@@ -257,7 +261,7 @@ const ClimateChangePage = () => {
                                                             rel="noopener noreferrer"
                                                             className="text-xs text-blue-600 hover:underline"
                                                         >
-                                                            Read more →
+                                                            {t('readMore')} →
                                                         </a>
                                                     )}
                                                 </div>
@@ -268,7 +272,7 @@ const ClimateChangePage = () => {
                             ) : (
                                 <div className="bg-white rounded-xl p-8 text-center text-gray-500">
                                     <Newspaper className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                                    <p>No climate news available at the moment</p>
+                                    <p>{t('noClimateNews')}</p>
                                 </div>
                             )}
                         </section>
@@ -277,28 +281,28 @@ const ClimateChangePage = () => {
                         <section className="bg-gradient-to-r from-blue-600 to-green-600 rounded-2xl p-8 text-white">
                             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                                 <AlertTriangle className="w-6 h-6" />
-                                Climate Change & Agriculture
+                                {t('climateChangeAgriculture')}
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
                                     <TrendingUp className="w-8 h-8 mb-2" />
-                                    <h3 className="font-semibold mb-1">Temperature Trends</h3>
+                                    <h3 className="font-semibold mb-1">{t('temperatureTrends')}</h3>
                                     <p className="text-sm text-white/80">
-                                        Monitor rising temperatures affecting crop cycles and yield
+                                        {t('temperatureTrendsDesc')}
                                     </p>
                                 </div>
                                 <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
                                     <CloudRain className="w-8 h-8 mb-2" />
-                                    <h3 className="font-semibold mb-1">Rainfall Patterns</h3>
+                                    <h3 className="font-semibold mb-1">{t('rainfallPatterns')}</h3>
                                     <p className="text-sm text-white/80">
-                                        Track irregular rainfall and seasonal variations
+                                        {t('rainfallPatternsDesc')}
                                     </p>
                                 </div>
                                 <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
                                     <Calendar className="w-8 h-8 mb-2" />
-                                    <h3 className="font-semibold mb-1">Seasonal Forecasts</h3>
+                                    <h3 className="font-semibold mb-1">{t('seasonalForecasts')}</h3>
                                     <p className="text-sm text-white/80">
-                                        Plan your farming activities based on climate predictions
+                                        {t('seasonalForecastsDesc')}
                                     </p>
                                 </div>
                             </div>

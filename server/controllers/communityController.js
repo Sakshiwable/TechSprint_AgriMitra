@@ -2,6 +2,7 @@ import Community from "../models/Community.js";
 import CommunityMessage from "../models/CommunityMessage.js";
 import User from "../models/User.js";
 import { getIO } from "../sockets/index.js";
+import translationOrchestrator from '../services/translationOrchestrator.js';
 
 // Create a new Community Request
 export const requestCommunity = async (req, res) => {
@@ -95,10 +96,39 @@ export const getCommunityDetails = async (req, res) => {
 export const getCommunityMessages = async (req, res) => {
   try {
     const { communityId } = req.params;
+    const targetLang = req.userLanguage || 'en';
+    
     const messages = await CommunityMessage.find({ communityId })
       .populate("sender", "name avatar")
       .sort({ createdAt: 1 }); // Oldest first
-    res.status(200).json(messages);
+    
+    // Translate messages if not English
+    let translatedMessages = messages;
+    if (targetLang !== 'en') {
+      translatedMessages = await Promise.all(
+        messages.map(async (message) => {
+          const messageObj = message.toObject();
+          
+          if (message.content && message.messageType === 'text') {
+            const translatedContent = await translationOrchestrator.translateContent(
+              message.content,
+              targetLang,
+              'community_message',
+              `${message._id}_content`
+            );
+            messageObj.content = translatedContent.text;
+            messageObj._translationMeta = {
+              confidence: translatedContent.confidence,
+              source: translatedContent.source
+            };
+          }
+          
+          return messageObj;
+        })
+      );
+    }
+    
+    res.status(200).json(translatedMessages);
   } catch (error) {
     res.status(500).json({ message: "Error fetching messages", error: error.message });
   }

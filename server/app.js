@@ -18,11 +18,13 @@ import marketAlertRoutes from "./routes/marketAlerts.js";
 import weatherRoutes from "./routes/weather.js";
 import newsRoutes from "./routes/news.js";
 import userLanguageRoutes from "./routes/userLanguageRoutes.js";
+import translationRoutes from "./routes/translationRoutesNew.js";
 import path from "path"; // Required for static serving
 import { fileURLToPath } from "url";
 
 // Translation middleware
 import languageDetector from "./middleware/languageDetector.js";
+import { autoTranslateMiddleware } from "./middleware/autoTranslate.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,11 +41,14 @@ app.use(
     origin: ["http://localhost:5173"], // frontend origin
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
-  })
+  }),
 );
 
 // Language detection middleware (before routes)
-app.use(languageDetector);
+app.use('/api', languageDetector);
+
+// Auto-translation middleware for all API responses
+app.use('/api', autoTranslateMiddleware);
 
 // 🔗 API Routes
 app.use("/api/user", userRoutes);
@@ -61,6 +66,9 @@ app.use("/api/experts", expertRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/chat", chatRoutes);
+
+// Translation route (dynamic content translation)
+app.use("/api/translate", translationRoutes);
 
 // 📂 Serve Static Uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

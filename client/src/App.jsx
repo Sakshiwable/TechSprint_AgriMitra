@@ -22,6 +22,7 @@ import AppLayout from "./AppLayout/applayout.jsx";
 import { NotificationProvider } from "./contexts/NotificationContext.jsx";
 import { LanguageProvider } from "./contexts/LanguageContext.jsx";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
+import { TranslationProvider } from "./contexts/TranslationContext.jsx";
 
 import { useAuth } from "./contexts/AuthContext.jsx";
 
@@ -59,8 +60,9 @@ export default function App() {
   // because ProtectedRoute/AdminRoute use useAuth() directly.
   return (
     <LanguageProvider>
-      <AuthProvider>
-        <NotificationProvider>
+      <TranslationProvider>
+        <AuthProvider>
+          <NotificationProvider>
           <Routes>
             {/* Public Auth Page */}
             <Route path="/" element={<Auth />} />
@@ -217,8 +219,9 @@ export default function App() {
           </Routes>
 
           <Toaster position="top-right" reverseOrder={false} />
-        </NotificationProvider>
-      </AuthProvider>
+          </NotificationProvider>
+        </AuthProvider>
+      </TranslationProvider>
     </LanguageProvider>
   );
 }

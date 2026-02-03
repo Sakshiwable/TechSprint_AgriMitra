@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { 
   Search, Plus, MapPin, MoreVertical, Phone, Video, 
   ArrowLeft, Send, Paperclip, Mic, Image as ImageIcon,
-  LogOut, X, Users, File, Sparkles, MessageCircle
+  LogOut, X, Users, File, Sparkles, MessageCircle, Languages
 } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -12,6 +12,7 @@ import { jwtDecode } from "jwt-decode";
 import { io } from "socket.io-client";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTranslation } from '../hooks/useTranslation';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,25 +20,51 @@ const SOCKET_URL = "http://localhost:4000";
 
 export default function CommunityPage() {
   const navigate = useNavigate();
-  const [mobileView, setMobileView] = useState("list"); // "list" or "chat"
+  const { t } = useTranslation();
+  const [mobileView, setMobileView] = useState("list");
   
-  // Data State
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
-  
-  // Chat State
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  const [translatedMessages, setTranslatedMessages] = useState({});
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
 
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
   const sidebarRef = useRef(null);
   const chatRef = useRef(null);
 
-  // GSAP Animations
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showMembersModal, setShowMembersModal] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const recordingStartTimeRef = useRef(null);
+  
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇮🇳' },
+    { code: 'hi', name: 'Hindi', flag: '🇮🇳' },
+    { code: 'bn', name: 'Bengali', flag: '🇮🇳' },
+    { code: 'te', name: 'Telugu', flag: '🇮🇳' },
+    { code: 'mr', name: 'Marathi', flag: '🇮🇳' },
+    { code: 'ta', name: 'Tamil', flag: '🇮🇳' },
+    { code: 'gu', name: 'Gujarati', flag: '🇮🇳' },
+    { code: 'kn', name: 'Kannada', flag: '🇮🇳' },
+    { code: 'ml', name: 'Malayalam', flag: '🇮🇳' },
+    { code: 'pa', name: 'Punjabi', flag: '🇮🇳' },
+    { code: 'or', name: 'Odia', flag: '🇮🇳' },
+    { code: 'as', name: 'Assamese', flag: '🇮🇳' }
+  ];
+
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Sidebar animation
       gsap.from(".community-item", {
         x: -30,
         opacity: 0,
@@ -50,7 +77,6 @@ export default function CommunityPage() {
         }
       });
 
-      // Chat messages animation
       gsap.from(".message-bubble", {
         y: 20,
         opacity: 0,
@@ -63,13 +89,9 @@ export default function CommunityPage() {
     return () => ctx.revert();
   }, [groups, messages]);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  // User State
-  const [currentUserId, setCurrentUserId] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -83,7 +105,6 @@ export default function CommunityPage() {
     }
     fetchCommunities();
 
-    // Socket Connection
     socketRef.current = io(SOCKET_URL, {
       auth: { token: token },
     });
@@ -111,12 +132,12 @@ export default function CommunityPage() {
       await axios.post(`http://localhost:4000/api/communities/${communityId}/join`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success("Joined community!");
+      toast.success(t('joinedCommunity'));
       fetchCommunities();
       const joinedGroup = groups.find(g => g._id === communityId);
       if (joinedGroup) setSelectedGroup(joinedGroup);
     } catch (error) {
-       toast.error(error.response?.data?.message || "Failed to join");
+       toast.error(error.response?.data?.message || t('failedToJoin'));
     }
   };
 
@@ -132,7 +153,6 @@ export default function CommunityPage() {
     }
   };
 
-  // Socket: Join/Leave Room & Listen for Messages
   useEffect(() => {
     if (!selectedGroup?._id || !socketRef.current) return;
 
@@ -171,7 +191,7 @@ export default function CommunityPage() {
       setNewMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
-      toast.error("Failed to send");
+      toast.error(t('failedToSend'));
     }
   };
 
@@ -186,13 +206,13 @@ export default function CommunityPage() {
        toast(
         (t) => (
           <div className="flex flex-col gap-2">
-            <span className="font-semibold">Join {group.name}?</span>
-            <span className="text-xs">Join to participate in discussions.</span>
+            <span className="font-semibold">{t('joinCommunity', { name: group.name })}</span>
+            <span className="text-xs">{t('joinToParticipate')}</span>
             <button 
               onClick={() => { toast.dismiss(t.id); handleJoin(group._id); }}
               className="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm hover:bg-emerald-700 transition"
             >
-              Join Now
+              {t('joinNow')}
             </button>
           </div>
         ),
@@ -208,7 +228,7 @@ export default function CommunityPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const toastId = toast.loading("Uploading...");
+      const toastId = toast.loading(t('uploading'));
 
       try {
           const token = localStorage.getItem("token");
@@ -231,42 +251,30 @@ export default function CommunityPage() {
               { headers: { Authorization: `Bearer ${token}` } }
           );
 
-          toast.success("Sent!", { id: toastId });
+          toast.success(t('sent'), { id: toastId });
       } catch (err) {
           console.error("Upload error", err);
-          toast.error("Upload failed", { id: toastId });
+          toast.error(t('uploadFailed'), { id: toastId });
       }
   };
 
   const handleLeaveCommunity = async () => {
       if(!selectedGroup) return;
-      if(!window.confirm(`Are you sure you want to leave ${selectedGroup.name}?`)) return;
+      if(!window.confirm(t('areYouSureLeave', { name: selectedGroup.name }))) return;
 
       try {
           const token = localStorage.getItem("token");
           await axios.post(`http://localhost:4000/api/communities/${selectedGroup._id}/leave`, {}, {
               headers: { Authorization: `Bearer ${token}` }
           });
-          toast.success(`Left ${selectedGroup.name}`);
+          toast.success(t('leftCommunity', { name: selectedGroup.name }));
           setSelectedGroup(null);
           fetchCommunities();
       } catch (err) {
           console.error(err);
-          toast.error("Failed to leave community");
+          toast.error(t('failedToLeaveCommunity'));
       }
   };
-
-  // Menu State
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showInfoModal, setShowInfoModal] = useState(false);
-  const [showMembersModal, setShowMembersModal] = useState(false);
-
-  // Audio State
-  const [isRecording, setIsRecording] = useState(false);
-
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
-  const recordingStartTimeRef = useRef(null);
 
   const startRecording = async () => {
     try {
@@ -290,7 +298,7 @@ export default function CommunityPage() {
       setIsRecording(true);
     } catch (err) {
       console.error("Error accessing microphone:", err);
-      toast.error("Microphone access denied");
+      toast.error(t('microphoneAccessDenied'));
     }
   };
 
@@ -301,7 +309,7 @@ export default function CommunityPage() {
         mediaRecorderRef.current.stop();
         mediaRecorderRef.current.onstop = null;
         setIsRecording(false);
-        toast("Hold to record...", { icon: "🎤" });
+        toast(t('holdToRecord'), { icon: "🎤" });
         return;
       }
       mediaRecorderRef.current.stop();
@@ -328,44 +336,83 @@ export default function CommunityPage() {
        );
     } catch (err) {
        console.error("Error sending voice message:", err);
-       toast.error("Failed to send voice message");
+       toast.error(t('failedToSendVoiceMessage'));
     }
   };
 
+  const translateText = async (text, targetLang) => {
+    try {
+      const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${targetLang}`);
+      const data = await response.json();
+      return data.responseData.translatedText;
+    } catch (error) {
+      console.error('Translation error:', error);
+      return text;
+    }
+  };
+
+  const handleTranslateMessage = async (messageId, originalText) => {
+    if (selectedLanguage === 'en' || !originalText?.trim()) return;
+    
+    setIsTranslating(true);
+    try {
+      const translatedText = await translateText(originalText, selectedLanguage);
+      setTranslatedMessages(prev => ({
+        ...prev,
+        [messageId]: translatedText
+      }));
+    } catch (error) {
+      if (error.message.includes('limit reached')) {
+        toast.error('Translation limit reached. Please try again later.');
+      } else {
+        toast.error(t('translationFailed'));
+      }
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  const toggleTranslation = (messageId) => {
+    setTranslatedMessages(prev => {
+      const newState = { ...prev };
+      if (newState[messageId]) {
+        delete newState[messageId];
+      }
+      return newState;
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f4fdf8] to-emerald-50 pt-20 ">
+    <div className="min-h-screen bg-gradient-to-br from-[#f4fdf8] to-emerald-50 pt-20">
       <div className="h-[calc(100vh-5rem)] flex gap-4 mx-4 overflow-hidden pb-4">
-        {/* Sidebar (Group List) */}
         <div
           ref={sidebarRef}
           className={`${
             mobileView === "list" ? "translate-x-0" : "-translate-x-full"
           } md:translate-x-0 fixed md:relative w-full md:w-80 lg:w-96 bg-white/80 backdrop-blur-xl rounded-3xl border border-emerald-100/50 shadow-2xl h-full transition-transform duration-300 z-30 flex flex-col overflow-hidden`}
         >
-          {/* Sidebar Header */}
           <div className="bg-gradient-to-r from-emerald-500 to-green-600 p-6 rounded-t-3xl flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
                 <MessageCircle className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-2xl font-bold text-white">Communities</h1>
+              <h1 className="text-2xl font-bold text-white">{t('communities')}</h1>
             </div>
             <button 
                onClick={() => navigate("/communities/request")}
                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-2.5 rounded-xl transition-all duration-300 hover:scale-110 shadow-lg"
-               title="Request New Community"
+               title={t('requestNewCommunity')}
             >
               <Plus size={20} />
             </button>
           </div>
 
-          {/* Group List */}
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
             {groups.length === 0 ? (
                <div className="p-8 text-center text-emerald-600">
                  <Users className="w-16 h-16 mx-auto mb-4 text-emerald-300" />
-                 <p className="font-semibold">No communities found.</p>
-                 <p className="text-sm text-emerald-500 mt-2">Request one to get started!</p>
+                 <p className="font-semibold">{t('noCommunitiesFound')}</p>
+                 <p className="text-sm text-emerald-500 mt-2">{t('requestOneToGetStarted')}</p>
                </div>
             ) : (
                groups.map((group) => {
@@ -406,12 +453,12 @@ export default function CommunityPage() {
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <Users size={12} className="text-emerald-500" />
-                        <span className="text-xs text-emerald-600">{group.members?.length || 0} members</span>
+                        <span className="text-xs text-emerald-600">{group.members?.length || 0} {t('members')}</span>
                       </div>
                     </div>
 
                     {isMember && (
-                       <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-lg" title="Joined"></div>
+                       <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-lg" title={t('joined')}></div>
                     )}
                   </button>
                  );
@@ -420,14 +467,12 @@ export default function CommunityPage() {
           </div>
         </div>
 
-        {/* Main Chat Area */}
         <div 
           ref={chatRef}
           className="flex-1 flex flex-col h-full bg-white/80 backdrop-blur-xl rounded-3xl border border-emerald-100/50 shadow-2xl overflow-hidden"
         >
           {selectedGroup ? (
             <>
-              {/* Chat Header */}
               <div className={`bg-gradient-to-r from-emerald-500 to-green-600 p-4 flex items-center justify-between shrink-0 shadow-lg ${mobileView === 'chat' ? 'flex' : 'hidden md:flex'}`}>
                 <div className="flex items-center gap-3">
                   <button
@@ -452,18 +497,59 @@ export default function CommunityPage() {
                       {selectedGroup.name}
                     </h2>
                     <p className="text-xs text-white/90 truncate max-w-[150px] md:max-w-none">
-                      {selectedGroup.members?.length || 0} members • {selectedGroup.topic}
+                      {selectedGroup.members?.length || 0} {t('members')} • {selectedGroup.topic}
                     </p>
                   </div>
                 </div>
                 
-                <div className="relative">
-                   <button 
-                      onClick={() => setIsMenuOpen(!isMenuOpen)}
-                      className="p-2 hover:bg-white/20 rounded-xl text-white transition backdrop-blur-sm"
-                   >
-                     <MoreVertical size={20} />
-                   </button>
+                <div className="flex items-center gap-2">
+                   <div className="relative">
+                     <button 
+                        onClick={() => setShowLanguageSelector(!showLanguageSelector)}
+                        className="p-2 hover:bg-white/20 rounded-xl text-white transition backdrop-blur-sm flex items-center gap-1"
+                        title={t('translateMessages')}
+                     >
+                       <Languages size={18} />
+                       <span className="text-xs hidden sm:block">{languages.find(l => l.code === selectedLanguage)?.flag}</span>
+                     </button>
+
+                     <AnimatePresence>
+                         {showLanguageSelector && (
+                             <motion.div 
+                                 initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                                 animate={{ opacity: 1, scale: 1, y: 0 }}
+                                 exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                                 className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden z-50 origin-top-right max-h-64 overflow-y-auto"
+                             >
+                                 {languages.map((lang) => (
+                                     <button 
+                                         key={lang.code}
+                                         onClick={() => {
+                                             setSelectedLanguage(lang.code);
+                                             setShowLanguageSelector(false);
+                                             setTranslatedMessages({});
+                                         }}
+                                         className={`w-full text-left px-4 py-3 hover:bg-emerald-50 text-sm flex items-center gap-3 transition ${
+                                             selectedLanguage === lang.code ? 'bg-emerald-50 text-emerald-700 font-semibold' : 'text-gray-700'
+                                         }`}
+                                     >
+                                         <span className="text-lg">{lang.flag}</span>
+                                         <span>{lang.name}</span>
+                                         {selectedLanguage === lang.code && <span className="ml-auto text-emerald-500">✓</span>}
+                                     </button>
+                                 ))}
+                             </motion.div>
+                         )}
+                     </AnimatePresence>
+                   </div>
+
+                   <div className="relative">
+                     <button 
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className="p-2 hover:bg-white/20 rounded-xl text-white transition backdrop-blur-sm"
+                     >
+                       <MoreVertical size={20} />
+                     </button>
 
                    <AnimatePresence>
                        {isMenuOpen && (
@@ -474,25 +560,25 @@ export default function CommunityPage() {
                                className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden z-50 origin-top-right"
                            >
                                <button onClick={() => { setShowInfoModal(true); setIsMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-emerald-50 text-sm text-gray-700 flex items-center gap-2 transition">
-                                   <MoreVertical size={16} /> Community Info
+                                   <MoreVertical size={16} /> {t('communityInfo')}
                                </button>
                                <button onClick={() => { setShowMembersModal(true); setIsMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-emerald-50 text-sm text-gray-700 flex items-center gap-2 transition">
-                                   <Users size={16} /> Members
+                                   <Users size={16} /> {t('members')}
                                </button>
                                <div className="h-px bg-emerald-100 my-1"/>
                                <button onClick={() => { setSelectedGroup(null); setIsMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-emerald-50 text-sm text-gray-700 flex items-center gap-2 transition">
-                                   <X size={16} /> Close Chat
+                                   <X size={16} /> {t('closeChat')}
                                </button>
                                <button onClick={() => { handleLeaveCommunity(); setIsMenuOpen(false); }} className="w-full text-left px-4 py-3 hover:bg-red-50 text-sm text-red-600 flex items-center gap-2 transition">
-                                   <LogOut size={16} /> Exit Community
+                                   <LogOut size={16} /> {t('exitCommunity')}
                                </button>
                            </motion.div>
                        )}
                    </AnimatePresence>
+                   </div>
                 </div>
               </div>
 
-              {/* Chat Messages */}
               <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 bg-[#f0f2f5]" style={{ backgroundImage: "radial-gradient(circle, #10b981 1px, transparent 1px)", backgroundSize: "20px 20px" }}>
                   <div className="flex justify-center my-4">
                     <span className="bg-white px-4 py-2 rounded-full text-xs text-emerald-600 shadow-md font-semibold border border-emerald-200">
@@ -502,24 +588,27 @@ export default function CommunityPage() {
                   
                   <div className="flex justify-center my-4">
                     <span className="bg-white border border-emerald-200 px-4 py-2 rounded-full text-xs text-emerald-700 shadow-sm text-center font-medium">
-                      🔒 Messages are end-to-end encrypted.
+                      🔒 {t('messagesEncrypted')}
                     </span>
                   </div>
 
                   {messages.length === 0 && (
                      <div className="text-center text-sm text-emerald-600 my-10">
                        <MessageCircle className="w-16 h-16 mx-auto mb-4 text-emerald-300" />
-                       <p className="font-semibold">No messages yet.</p>
-                       <p className="text-emerald-500 mt-1">Be the first to say hi! 👋</p>
+                       <p className="font-semibold">{t('noMessagesYet')}</p>
+                       <p className="text-emerald-500 mt-1">{t('beFirstToSayHi')}</p>
                      </div>
                   )}
 
                   {messages.map((msg) => {
                     const isMe = (msg.sender?._id || msg.sender) === currentUserId;
+                    const hasTranslation = translatedMessages[msg._id];
+                    const showTranslateButton = msg.messageType !== 'audio' && msg.messageType !== 'image' && msg.messageType !== 'file' && selectedLanguage !== 'en' && msg.content && msg.content.trim();
+                    
                     return (
                       <div 
                         key={msg._id} 
-                        className={`message-bubble flex ${isMe ? "justify-end" : "justify-start"} px-2`}
+                        className={`message-bubble flex ${isMe ? "justify-end" : "justify-start"} px-2 group`}
                       >
                          <div className={`max-w-[80%] md:max-w-[70%] rounded-2xl p-3 md:p-4 shadow-md relative ${
                            isMe 
@@ -539,15 +628,39 @@ export default function CommunityPage() {
                             ) : msg.messageType === 'file' ? (
                                 <div className="mt-1 flex items-center gap-2 p-3 bg-emerald-50 rounded-xl border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer" onClick={() => window.open(`http://localhost:4000${msg.content}`, '_blank')}>
                                     <Paperclip size={16} className="text-emerald-600" />
-                                    <span className="text-sm font-medium text-emerald-700 truncate max-w-[150px]">Attachment</span>
+                                    <span className="text-sm font-medium text-emerald-700 truncate max-w-[150px]">{t('attachment')}</span>
                                 </div>
                             ) : (
-                               <p className={`text-sm md:text-base break-words leading-relaxed ${isMe ? "text-white" : "text-gray-800"}`}>{msg.content}</p>
+                               <div>
+                                 <p className={`text-sm md:text-base break-words leading-relaxed ${isMe ? "text-white" : "text-gray-800"}`}>
+                                   {hasTranslation ? translatedMessages[msg._id] : msg.content}
+                                 </p>
+                                 {hasTranslation && (
+                                   <div className={`mt-2 pt-2 border-t ${isMe ? 'border-white/20' : 'border-gray-200'}`}>
+                                     <p className={`text-xs italic ${isMe ? 'text-white/70' : 'text-gray-500'}`}>
+                                       {t('original')}: {msg.content}
+                                     </p>
+                                   </div>
+                                 )}
+                               </div>
                             )}
 
-                            <span className={`text-[10px] md:text-xs block text-right mt-1.5 ${isMe ? "text-white/80" : "text-gray-500"}`}>
-                              {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' })}
-                            </span>
+                            <div className="flex items-center justify-between mt-1.5">
+                              <span className={`text-[10px] md:text-xs ${isMe ? "text-white/80" : "text-gray-500"}`}>
+                                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' })}
+                              </span>
+                              
+                              {showTranslateButton && (
+                                <button
+                                  onClick={() => hasTranslation ? toggleTranslation(msg._id) : handleTranslateMessage(msg._id, msg.content)}
+                                  className={`opacity-0 group-hover:opacity-100 transition-opacity ml-2 p-1 rounded ${isMe ? 'hover:bg-white/20 text-white/80' : 'hover:bg-gray-100 text-gray-500'}`}
+                                  title={hasTranslation ? t('showOriginal') : t('translateMessage')}
+                                  disabled={isTranslating}
+                                >
+                                  <Languages size={12} />
+                                </button>
+                              )}
+                            </div>
                          </div>
                       </div>
                     );
@@ -555,7 +668,6 @@ export default function CommunityPage() {
                   <div ref={messagesEndRef} />
               </div>
 
-              {/* Input Area */}
               <div className="bg-[#f0f2f5] p-3 md:p-4 flex items-center gap-2 md:gap-3 shrink-0 border-t border-gray-200">
                  <button className="p-2 md:p-2.5 text-gray-600 hover:text-emerald-600 hover:bg-white rounded-xl transition">
                    <Plus size={20} className="md:w-6 md:h-6" />
@@ -563,7 +675,7 @@ export default function CommunityPage() {
                  <div className="flex-1 bg-white rounded-2xl flex items-center px-3 md:px-4 py-2 md:py-3 shadow-sm border border-gray-200">
                     <input 
                       className="flex-1 outline-none text-gray-800 bg-transparent placeholder:text-gray-400 text-sm md:text-base"
-                      placeholder={isRecording ? "Recording audio..." : "Type a message..."}
+                      placeholder={isRecording ? t('recordingAudio') : t('typeMessage')}
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
@@ -602,9 +714,7 @@ export default function CommunityPage() {
                  )}
               </div>
 
-              {/* Modals */}
               <AnimatePresence>
-                  {/* Community Info Modal */}
                   {showInfoModal && (
                       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                           <motion.div 
@@ -626,18 +736,18 @@ export default function CommunityPage() {
                                   <p className="text-emerald-600 font-semibold">{selectedGroup.topic}</p>
                                   
                                   <div className="mt-4 p-4 bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border border-emerald-100">
-                                      <h4 className="font-bold text-emerald-700 text-sm mb-2 uppercase tracking-wider">Description</h4>
-                                      <p className="text-gray-600 text-sm leading-relaxed">{selectedGroup.description || "No description available."}</p>
+                                      <h4 className="font-bold text-emerald-700 text-sm mb-2 uppercase tracking-wider">{t('description')}</h4>
+                                      <p className="text-gray-600 text-sm leading-relaxed">{selectedGroup.description || t('noDescriptionAvailable')}</p>
                                   </div>
 
                                   <div className="mt-4 flex gap-4 text-center">
                                       <div className="flex-1 p-4 border border-emerald-100 rounded-2xl bg-emerald-50">
                                           <div className="text-2xl font-bold text-emerald-700">{selectedGroup.members?.length || 0}</div>
-                                          <div className="text-xs text-emerald-600 uppercase font-semibold mt-1">Members</div>
+                                          <div className="text-xs text-emerald-600 uppercase font-semibold mt-1">{t('members')}</div>
                                       </div>
                                       <div className="flex-1 p-4 border border-emerald-100 rounded-2xl bg-emerald-50">
                                           <div className="text-2xl font-bold text-emerald-700">{new Date(selectedGroup.createdAt).getFullYear()}</div>
-                                          <div className="text-xs text-emerald-600 uppercase font-semibold mt-1">Created</div>
+                                          <div className="text-xs text-emerald-600 uppercase font-semibold mt-1">{t('created')}</div>
                                       </div>
                                   </div>
                               </div>
@@ -645,7 +755,6 @@ export default function CommunityPage() {
                       </div>
                   )}
 
-                  {/* Members Modal */}
                   {showMembersModal && (
                       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                           <motion.div 
@@ -655,7 +764,7 @@ export default function CommunityPage() {
                               className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl h-[60vh] flex flex-col border border-emerald-100"
                           >
                               <div className="p-5 border-b border-emerald-100 bg-gradient-to-r from-emerald-50 to-green-50 flex items-center justify-between">
-                                  <h3 className="font-bold text-lg text-gray-800">Community Members</h3>
+                                  <h3 className="font-bold text-lg text-gray-800">{t('communityMembers')}</h3>
                                   <button onClick={() => setShowMembersModal(false)} className="text-emerald-600 hover:text-emerald-700 transition"><X size={20}/></button>
                               </div>
                               <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -665,8 +774,8 @@ export default function CommunityPage() {
                                               {member.avatar ? <img src={member.avatar} className="w-full h-full rounded-xl object-cover"/> : (member.name?.[0] || 'U')}
                                           </div>
                                           <div>
-                                              <div className="font-semibold text-gray-800 text-sm">{member.name || "Unknown User"}</div>
-                                              <div className="text-xs text-emerald-600">Member</div>
+                                              <div className="font-semibold text-gray-800 text-sm">{member.name || t('unknownUser')}</div>
+                                              <div className="text-xs text-emerald-600">{t('member')}</div>
                                           </div>
                                       </div>
                                   ))}
@@ -675,20 +784,18 @@ export default function CommunityPage() {
                       </div>
                   )}
               </AnimatePresence>
-
             </>
           ) : (
-            /* Empty State */
             <div className="hidden md:flex flex-col items-center justify-center h-full text-center p-8 bg-gradient-to-br from-emerald-50 to-green-50">
                <div className="w-64 h-64 bg-gradient-to-br from-emerald-200 to-green-300 rounded-full flex items-center justify-center mb-6 shadow-2xl">
                  <Sparkles className="w-32 h-32 text-emerald-600" />
                </div>
-               <h2 className="text-4xl font-bold text-gray-800 mb-3">AgriMitra Communities</h2>
+               <h2 className="text-4xl font-bold text-gray-800 mb-3">{t('agriMitraCommunities')}</h2>
                <p className="text-emerald-600 max-w-md text-lg">
-                 Select a community to view discussions, share tips, and connect with other farmers.
+                 {t('selectCommunityToView')}
                </p>
                <div className="mt-8 flex items-center gap-2 text-emerald-500 text-sm font-semibold">
-                 <MapPin size={16} /> End-to-end encrypted
+                 <MapPin size={16} /> {t('endToEndEncrypted')}
                </div>
             </div>
           )}

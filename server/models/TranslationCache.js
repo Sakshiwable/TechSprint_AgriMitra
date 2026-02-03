@@ -15,7 +15,7 @@ const translationCacheSchema = new mongoose.Schema({
   },
   contentType: {
     type: String,
-    enum: ['news', 'scheme', 'weather', 'market_price', 'chat_message', 'general'],
+    enum: ['news', 'scheme', 'weather', 'market_price', 'market_commodity', 'market_state', 'market_name', 'community_message', 'general'],
     required: true,
     index: true
   },

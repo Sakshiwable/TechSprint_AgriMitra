@@ -3,12 +3,14 @@ import { fetchMySchemes, fetchFilters } from '../api/govSchemeApi';
 import FilterSidebar from '../components/FilterSidebar';
 import SchemeCard from '../components/SchemeCard';
 import { Search, Filter, BookOpen } from 'lucide-react';
+import { useTranslation } from '../hooks/useTranslation';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const GovSchemesPage = () => {
+  const { t } = useTranslation();
   const [schemes, setSchemes] = useState([]);
   const [filters, setFilters] = useState({});
   const [selectedFilters, setSelectedFilters] = useState({});
@@ -146,7 +148,7 @@ const GovSchemesPage = () => {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
-                    placeholder='For an exact match, put the words in quotes. For example: "Scheme Name"'
+                    placeholder={t('search') + ' schemes...'}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 bg-white/50 border border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-700 placeholder-gray-400"
@@ -157,10 +159,10 @@ const GovSchemesPage = () => {
                   className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   <Search className="w-5 h-5" />
-                  Search
+                  {t('search')}
                 </button>
                 <div className="flex items-center gap-2">
-                  <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">Sort:</label>
+                  <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">{t('sort')}:</label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
@@ -186,7 +188,7 @@ const GovSchemesPage = () => {
                   setCurrentPage(1);
                 }}
               >
-                All Schemes
+                {t('allSchemes')}
               </button>
               <button
                 className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
@@ -199,7 +201,7 @@ const GovSchemesPage = () => {
                   setCurrentPage(1);
                 }}
               >
-                State Schemes
+                {t('stateSchemes')}
               </button>
               <button
                 className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
@@ -212,7 +214,7 @@ const GovSchemesPage = () => {
                   setCurrentPage(1);
                 }}
               >
-                Central Schemes
+                {t('centralSchemes')}
               </button>
             </div>
 

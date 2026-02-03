@@ -1,12 +1,13 @@
 import MarketPrice from '../models/MarketPrice.js';
-import { translateMarketPrice } from '../services/TranslationService.js';
+import translationOrchestrator from '../services/translationOrchestrator.js';
 
 // @desc    Get latest market prices
 // @route   GET /api/market/prices
 // @access  Public
 export const getMarketPrices = async (req, res) => {
     try {
-        const { commodity, state, limit = 50, lang } = req.query;
+        const { commodity, state, limit = 50 } = req.query;
+        const targetLang = req.userLanguage || 'en';
         
         const query = {};
         if (commodity) query.commodity = new RegExp(commodity, 'i');
@@ -16,10 +17,49 @@ export const getMarketPrices = async (req, res) => {
             .sort({ date: -1, scraped_at: -1 })
             .limit(parseInt(limit));
 
-        // Translate if language specified
+        // Translate if not English
         let data = prices;
-        if (lang && lang !== 'en') {
-            data = await Promise.all(prices.map(p => translateMarketPrice(p, lang)));
+        if (targetLang !== 'en') {
+            data = await Promise.all(
+                prices.map(async (price) => {
+                    const priceObj = price.toObject();
+                    
+                    // Translate commodity name
+                    if (price.commodity) {
+                        const translatedCommodity = await translationOrchestrator.translateContent(
+                            price.commodity,
+                            targetLang,
+                            'market_commodity',
+                            `commodity_${price.commodity}`
+                        );
+                        priceObj.commodity = translatedCommodity.text;
+                    }
+                    
+                    // Translate state name
+                    if (price.state) {
+                        const translatedState = await translationOrchestrator.translateContent(
+                            price.state,
+                            targetLang,
+                            'market_state',
+                            `state_${price.state}`
+                        );
+                        priceObj.state = translatedState.text;
+                    }
+                    
+                    // Translate market name
+                    if (price.market) {
+                        const translatedMarket = await translationOrchestrator.translateContent(
+                            price.market,
+                            targetLang,
+                            'market_name',
+                            `market_${price.market}`
+                        );
+                        priceObj.market = translatedMarket.text;
+                    }
+                    
+                    return priceObj;
+                })
+            );
         }
         
         res.json({

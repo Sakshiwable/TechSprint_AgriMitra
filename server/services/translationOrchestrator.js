@@ -34,24 +34,26 @@ class TranslationOrchestrator {
         return cached;
       }
       
-      // Cache miss - translate via Python service
+      // Cache miss - translate via service
       const translated = await this.callTranslationService(content, 'en', targetLang);
       
-      // Store in cache
-      await this.storeTranslation(
-        sourceId,
-        contentHash,
-        contentType,
-        content,
-        targetLang,
-        translated.translated_text,
-        translated.confidence
-      );
+      // Store in cache only if translation was successful
+      if (translated.translated_text && translated.confidence > 0.5) {
+        await this.storeTranslation(
+          sourceId,
+          contentHash,
+          contentType,
+          content,
+          targetLang,
+          translated.translated_text,
+          translated.confidence
+        );
+      }
       
       return {
-        text: translated.translated_text,
-        confidence: translated.confidence,
-        source: 'live'
+        text: translated.translated_text || content,
+        confidence: translated.confidence || 0.1,
+        source: translated.error ? 'fallback' : 'live'
       };
       
     } catch (error) {
@@ -152,10 +154,10 @@ class TranslationOrchestrator {
           source_lang: sourceLang,
           target_lang: targetLang,
           preserve_html: true,
-          calculate_back_translation: false // Set to true for critical content
+          calculate_back_translation: false
         },
         {
-          timeout: 30000, // 30 second timeout
+          timeout: 30000,
           headers: {
             'Content-Type': 'application/json'
           }
@@ -165,13 +167,15 @@ class TranslationOrchestrator {
       return response.data;
       
     } catch (error) {
-      if (error.response) {
-        throw new Error(`Translation service error: ${error.response.status} - ${error.response.data?.detail || 'Unknown error'}`);
-      } else if (error.request) {
-        throw new Error('Translation service unavailable');
-      } else {
-        throw new Error(`Translation request failed: ${error.message}`);
-      }
+      console.warn('Translation service unavailable, using fallback');
+      
+      // Simple fallback - return original text with low confidence
+      return {
+        translated_text: text,
+        confidence: 0.1,
+        source: 'fallback',
+        error: 'Translation service unavailable'
+      };
     }
   }
 

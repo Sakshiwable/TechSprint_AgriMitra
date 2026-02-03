@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import urllib3
+from pymongo import MongoClient
+import hashlib, time
 
 # Suppress InsecureRequestWarning
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -9,6 +11,31 @@ HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
 }
+
+client = MongoClient("mongodb://...")
+db = client['agri']
+col = db['sources']
+
+def compute_hash(text): return hashlib.sha256(text.encode('utf-8')).hexdigest()
+
+def scrape_and_store(url):
+    r = requests.get(url, timeout=15)
+    r.raise_for_status()
+    html = r.text
+    # minimal sanitize
+    soup = BeautifulSoup(html, "html.parser")
+    article = soup.find("article") or soup.body
+    raw_html = str(article)
+    source_hash = compute_hash(raw_html)
+    doc = {
+      "source_id": compute_hash(url),
+      "url": url,
+      "original_lang": "auto", 
+      "raw_html": raw_html,
+      "source_hash": source_hash,
+      "metadata": {"scraped_at": time.time()}
+    }
+    col.update_one({"source_id": doc["source_id"]}, {"$set": doc}, upsert=True)
 
 def scrape_pm_kisan():
     try:
