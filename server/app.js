@@ -17,8 +17,12 @@ import cropRoutes from "./routes/crops.js";
 import marketAlertRoutes from "./routes/marketAlerts.js";
 import weatherRoutes from "./routes/weather.js";
 import newsRoutes from "./routes/news.js";
+import userLanguageRoutes from "./routes/userLanguageRoutes.js";
 import path from "path"; // Required for static serving
 import { fileURLToPath } from "url";
+
+// Translation middleware
+import languageDetector from "./middleware/languageDetector.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,13 +37,17 @@ app.use(express.json());
 app.use(
   cors({
     origin: ["http://localhost:5173"], // frontend origin
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
 );
 
+// Language detection middleware (before routes)
+app.use(languageDetector);
+
 // 🔗 API Routes
 app.use("/api/user", userRoutes);
+app.use("/api/users", userLanguageRoutes); // Language preference routes
 app.use("/api/auth", authRoutes);
 app.use("/api/communities", communityRoutes);
 

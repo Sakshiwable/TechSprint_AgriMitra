@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sprout, Menu, X, ArrowRight, Globe, ChevronDown, User, LogOut, Bot, ScanLine, Users, Store, TrendingUp, ShoppingCart, Cloud, CloudRain } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import LanguageSelector from './LanguageSelector';
 import gsap from 'gsap';
 
 export default function Navbar() {
@@ -236,13 +237,8 @@ export default function Navbar() {
 
           {/* RIGHT: Actions */}
           <div className="hidden lg:flex items-center gap-4">
-               <button 
-                  onClick={() => setLanguage(language === 'en' ? 'hi' : language === 'hi' ? 'mr' : 'en')}
-                  className="flex items-center gap-1.5 text-xs font-bold text-teal-700 hover:bg-teal-50 px-3 py-1.5 rounded-full transition-colors uppercase tracking-wider"
-               >
-                 <Globe className="w-3.5 h-3.5" />
-                 {language === 'en' ? 'English' : language === 'hi' ? 'हिंदी' : 'मराठी'}
-               </button>
+               {/* Replace simple toggle with LanguageSelector component */}
+               <LanguageSelector />
 
                {user ? (
                  <div className="relative dropdown-container">

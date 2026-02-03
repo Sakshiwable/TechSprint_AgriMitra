@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './FilterSidebar.css';
+import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
 
 const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilters }) => {
   const [expandedSections, setExpandedSections] = useState({});
@@ -48,25 +48,30 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
   };
 
   return (
-    <div className="filter-sidebar">
-      <div className="filter-header">
-        <h3>Filter By</h3>
-        <button className="reset-filters" onClick={onResetFilters}>
-          Reset Filters
+    <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-emerald-100">
+      <div className="flex justify-between items-center mb-6 pb-4 border-b border-emerald-200">
+        <div className="flex items-center gap-2">
+          <Filter className="w-5 h-5 text-emerald-600" />
+          <h3 className="text-xl font-bold text-gray-800">Filter By</h3>
+        </div>
+        <button
+          onClick={onResetFilters}
+          className="text-sm text-emerald-600 hover:text-emerald-700 font-semibold underline transition-colors"
+        >
+          Reset
         </button>
       </div>
 
-      <div className="filter-sections">
+      <div className="space-y-5">
         {/* State Dropdown */}
-        <div className="filter-section">
-          <label className="filter-label">State</label>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">State</label>
           <select
-            className="filter-select"
+            className="w-full px-4 py-2.5 bg-white/50 border border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-700 cursor-pointer"
             value={selectedFilters.state || ''}
             onChange={(e) => handleDropdownChange('state', e.target.value)}
           >
             <option value="">Select</option>
-            {/* Add state options dynamically from filters */}
             <option value="Andhra Pradesh">Andhra Pradesh</option>
             <option value="Maharashtra">Maharashtra</option>
             <option value="Karnataka">Karnataka</option>
@@ -76,34 +81,44 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
         </div>
 
         {/* Gender */}
-        <div className="filter-section expandable">
-          <div className="filter-label-row" onClick={() => toggleSection('gender')}>
-            <label className="filter-label">Gender</label>
-            <span className="expand-icon">{expandedSections.gender ? '−' : '+'}</span>
+        <div>
+          <div
+            className="flex justify-between items-center cursor-pointer mb-2"
+            onClick={() => toggleSection('gender')}
+          >
+            <label className="text-sm font-semibold text-gray-700">Gender</label>
+            {expandedSections.gender ? (
+              <ChevronUp className="w-5 h-5 text-emerald-600" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-emerald-600" />
+            )}
           </div>
           {expandedSections.gender && (
-            <div className="filter-options">
-              <label className="filter-checkbox">
+            <div className="space-y-2 pl-2">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600 hover:text-emerald-600 transition-colors">
                 <input
                   type="checkbox"
                   checked={(selectedFilters.gender || []).includes('Male')}
                   onChange={() => handleCheckboxChange('gender', 'Male')}
+                  className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
                 />
                 <span>Male</span>
               </label>
-              <label className="filter-checkbox">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600 hover:text-emerald-600 transition-colors">
                 <input
                   type="checkbox"
                   checked={(selectedFilters.gender || []).includes('Female')}
                   onChange={() => handleCheckboxChange('gender', 'Female')}
+                  className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
                 />
                 <span>Female</span>
               </label>
-              <label className="filter-checkbox">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600 hover:text-emerald-600 transition-colors">
                 <input
                   type="checkbox"
                   checked={(selectedFilters.gender || []).includes('Transgender')}
                   onChange={() => handleCheckboxChange('gender', 'Transgender')}
+                  className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
                 />
                 <span>Transgender</span>
               </label>
@@ -112,10 +127,10 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
         </div>
 
         {/* Age Dropdown */}
-        <div className="filter-section">
-          <label className="filter-label">Age</label>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">Age</label>
           <select
-            className="filter-select"
+            className="w-full px-4 py-2.5 bg-white/50 border border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-700 cursor-pointer"
             value={selectedFilters.age || ''}
             onChange={(e) => handleDropdownChange('age', e.target.value)}
           >
@@ -127,118 +142,100 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
         </div>
 
         {/* Caste */}
-        <div className="filter-section expandable">
-          <div className="filter-label-row" onClick={() => toggleSection('caste')}>
-            <label className="filter-label">Caste</label>
-            <span className="expand-icon">{expandedSections.caste ? '−' : '+'}</span>
+        <div>
+          <div
+            className="flex justify-between items-center cursor-pointer mb-2"
+            onClick={() => toggleSection('caste')}
+          >
+            <label className="text-sm font-semibold text-gray-700">Caste</label>
+            {expandedSections.caste ? (
+              <ChevronUp className="w-5 h-5 text-emerald-600" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-emerald-600" />
+            )}
           </div>
           {expandedSections.caste && (
-            <div className="filter-options">
-              <label className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={(selectedFilters.caste || []).includes('General')}
-                  onChange={() => handleCheckboxChange('caste', 'General')}
-                />
-                <span>General</span>
-              </label>
-              <label className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={(selectedFilters.caste || []).includes('SC')}
-                  onChange={() => handleCheckboxChange('caste', 'SC')}
-                />
-                <span>SC</span>
-              </label>
-              <label className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={(selectedFilters.caste || []).includes('ST')}
-                  onChange={() => handleCheckboxChange('caste', 'ST')}
-                />
-                <span>ST</span>
-              </label>
-              <label className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={(selectedFilters.caste || []).includes('OBC')}
-                  onChange={() => handleCheckboxChange('caste', 'OBC')}
-                />
-                <span>OBC</span>
-              </label>
+            <div className="space-y-2 pl-2">
+              {['General', 'SC', 'ST', 'OBC'].map((caste) => (
+                <label key={caste} className="flex items-center gap-2 cursor-pointer text-sm text-gray-600 hover:text-emerald-600 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={(selectedFilters.caste || []).includes(caste)}
+                    onChange={() => handleCheckboxChange('caste', caste)}
+                    className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
+                  />
+                  <span>{caste}</span>
+                </label>
+              ))}
             </div>
           )}
         </div>
 
         {/* Residence */}
-        <div className="filter-section expandable">
-          <div className="filter-label-row" onClick={() => toggleSection('residence')}>
-            <label className="filter-label">Residence</label>
-            <span className="expand-icon">{expandedSections.residence ? '−' : '+'}</span>
+        <div>
+          <div
+            className="flex justify-between items-center cursor-pointer mb-2"
+            onClick={() => toggleSection('residence')}
+          >
+            <label className="text-sm font-semibold text-gray-700">Residence</label>
+            {expandedSections.residence ? (
+              <ChevronUp className="w-5 h-5 text-emerald-600" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-emerald-600" />
+            )}
           </div>
           {expandedSections.residence && (
-            <div className="filter-options">
-              <label className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={(selectedFilters.residence || []).includes('Urban')}
-                  onChange={() => handleCheckboxChange('residence', 'Urban')}
-                />
-                <span>Urban</span>
-              </label>
-              <label className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={(selectedFilters.residence || []).includes('Rural')}
-                  onChange={() => handleCheckboxChange('residence', 'Rural')}
-                />
-                <span>Rural</span>
-              </label>
+            <div className="space-y-2 pl-2">
+              {['Urban', 'Rural'].map((residence) => (
+                <label key={residence} className="flex items-center gap-2 cursor-pointer text-sm text-gray-600 hover:text-emerald-600 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={(selectedFilters.residence || []).includes(residence)}
+                    onChange={() => handleCheckboxChange('residence', residence)}
+                    className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
+                  />
+                  <span>{residence}</span>
+                </label>
+              ))}
             </div>
           )}
         </div>
 
         {/* Benefit Type */}
-        <div className="filter-section expandable">
-          <div className="filter-label-row" onClick={() => toggleSection('benefitType')}>
-            <label className="filter-label">Benefit Type</label>
-            <span className="expand-icon">{expandedSections.benefitType ? '−' : '+'}</span>
+        <div>
+          <div
+            className="flex justify-between items-center cursor-pointer mb-2"
+            onClick={() => toggleSection('benefitType')}
+          >
+            <label className="text-sm font-semibold text-gray-700">Benefit Type</label>
+            {expandedSections.benefitType ? (
+              <ChevronUp className="w-5 h-5 text-emerald-600" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-emerald-600" />
+            )}
           </div>
           {expandedSections.benefitType && (
-            <div className="filter-options">
-              <label className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={(selectedFilters.benefitType || []).includes('Financial')}
-                  onChange={() => handleCheckboxChange('benefitType', 'Financial')}
-                />
-                <span>Financial</span>
-              </label>
-              <label className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={(selectedFilters.benefitType || []).includes('Education')}
-                  onChange={() => handleCheckboxChange('benefitType', 'Education')}
-                />
-                <span>Education</span>
-              </label>
-              <label className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={(selectedFilters.benefitType || []).includes('Health')}
-                  onChange={() => handleCheckboxChange('benefitType', 'Health')}
-                />
-                <span>Health</span>
-              </label>
+            <div className="space-y-2 pl-2">
+              {['Financial', 'Education', 'Health'].map((type) => (
+                <label key={type} className="flex items-center gap-2 cursor-pointer text-sm text-gray-600 hover:text-emerald-600 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={(selectedFilters.benefitType || []).includes(type)}
+                    onChange={() => handleCheckboxChange('benefitType', type)}
+                    className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
+                  />
+                  <span>{type}</span>
+                </label>
+              ))}
             </div>
           )}
         </div>
 
         {/* Disability Percentage Dropdown */}
-        <div className="filter-section">
-          <label className="filter-label">Disability Percentage</label>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">Disability Percentage</label>
           <select
-            className="filter-select"
+            className="w-full px-4 py-2.5 bg-white/50 border border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-700 cursor-pointer"
             value={selectedFilters.disability || ''}
             onChange={(e) => handleDropdownChange('disability', e.target.value)}
           >
@@ -250,46 +247,40 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
         </div>
 
         {/* Employment Status */}
-        <div className="filter-section expandable">
-          <div className="filter-label-row" onClick={() => toggleSection('employmentStatus')}>
-            <label className="filter-label">Employment Status</label>
-            <span className="expand-icon">{expandedSections.employmentStatus ? '−' : '+'}</span>
+        <div>
+          <div
+            className="flex justify-between items-center cursor-pointer mb-2"
+            onClick={() => toggleSection('employmentStatus')}
+          >
+            <label className="text-sm font-semibold text-gray-700">Employment Status</label>
+            {expandedSections.employmentStatus ? (
+              <ChevronUp className="w-5 h-5 text-emerald-600" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-emerald-600" />
+            )}
           </div>
           {expandedSections.employmentStatus && (
-            <div className="filter-options">
-              <label className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={(selectedFilters.employmentStatus || []).includes('Employed')}
-                  onChange={() => handleCheckboxChange('employmentStatus', 'Employed')}
-                />
-                <span>Employed</span>
-              </label>
-              <label className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={(selectedFilters.employmentStatus || []).includes('Unemployed')}
-                  onChange={() => handleCheckboxChange('employmentStatus', 'Unemployed')}
-                />
-                <span>Unemployed</span>
-              </label>
-              <label className="filter-checkbox">
-                <input
-                  type="checkbox"
-                  checked={(selectedFilters.employmentStatus || []).includes('Self-Employed')}
-                  onChange={() => handleCheckboxChange('employmentStatus', 'Self-Employed')}
-                />
-                <span>Self-Employed</span>
-              </label>
+            <div className="space-y-2 pl-2">
+              {['Employed', 'Unemployed', 'Self-Employed'].map((status) => (
+                <label key={status} className="flex items-center gap-2 cursor-pointer text-sm text-gray-600 hover:text-emerald-600 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={(selectedFilters.employmentStatus || []).includes(status)}
+                    onChange={() => handleCheckboxChange('employmentStatus', status)}
+                    className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
+                  />
+                  <span>{status}</span>
+                </label>
+              ))}
             </div>
           )}
         </div>
 
         {/* Occupation Dropdown */}
-        <div className="filter-section">
-          <label className="filter-label">Occupation</label>
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">Occupation</label>
           <select
-            className="filter-select"
+            className="w-full px-4 py-2.5 bg-white/50 border border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-700 cursor-pointer"
             value={selectedFilters.occupation || ''}
             onChange={(e) => handleDropdownChange('occupation', e.target.value)}
           >
@@ -302,76 +293,31 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
         </div>
 
         {/* Special Tags */}
-        <div className="filter-section special-tags">
-          <label className="filter-checkbox">
-            <input
-              type="checkbox"
-              checked={!!selectedFilters.minority}
-              onChange={() => handleSpecialTagChange('minority')}
-            />
-            <span>Minority</span>
-            <span className="tag-count">{filters.specialTags?.minority || 0}</span>
-          </label>
-
-          <label className="filter-checkbox">
-            <input
-              type="checkbox"
-              checked={!!selectedFilters.differentlyAbled}
-              onChange={() => handleSpecialTagChange('differentlyAbled')}
-            />
-            <span>Differently Abled</span>
-            <span className="tag-count">{filters.specialTags?.differentlyAbled || 0}</span>
-          </label>
-
-          <label className="filter-checkbox">
-            <input
-              type="checkbox"
-              checked={!!selectedFilters.dbtScheme}
-              onChange={() => handleSpecialTagChange('dbtScheme')}
-            />
-            <span>DBT Scheme</span>
-            <span className="tag-count">{filters.specialTags?.dbtScheme || 0}</span>
-          </label>
-
-          <label className="filter-checkbox">
-            <input
-              type="checkbox"
-              checked={!!selectedFilters.belowPovertyLine}
-              onChange={() => handleSpecialTagChange('belowPovertyLine')}
-            />
-            <span>Below Poverty Line</span>
-            <span className="tag-count">{filters.specialTags?.belowPovertyLine || 0}</span>
-          </label>
-
-          <label className="filter-checkbox">
-            <input
-              type="checkbox"
-              checked={!!selectedFilters.economicDistress}
-              onChange={() => handleSpecialTagChange('economicDistress')}
-            />
-            <span>Economic Distress</span>
-            <span className="tag-count">{filters.specialTags?.economicDistress || 0}</span>
-          </label>
-
-          <label className="filter-checkbox">
-            <input
-              type="checkbox"
-              checked={!!selectedFilters.governmentEmployee}
-              onChange={() => handleSpecialTagChange('governmentEmployee')}
-            />
-            <span>Government Employee</span>
-            <span className="tag-count">{filters.specialTags?.governmentEmployee || 0}</span>
-          </label>
-
-          <label className="filter-checkbox">
-            <input
-              type="checkbox"
-              checked={!!selectedFilters.student}
-              onChange={() => handleSpecialTagChange('student')}
-            />
-            <span>Student</span>
-            <span className="tag-count">{filters.specialTags?.student || 0}</span>
-          </label>
+        <div className="pt-4 border-t border-emerald-200 space-y-2">
+          {[
+            { key: 'minority', label: 'Minority' },
+            { key: 'differentlyAbled', label: 'Differently Abled' },
+            { key: 'dbtScheme', label: 'DBT Scheme' },
+            { key: 'belowPovertyLine', label: 'Below Poverty Line' },
+            { key: 'economicDistress', label: 'Economic Distress' },
+            { key: 'governmentEmployee', label: 'Government Employee' },
+            { key: 'student', label: 'Student' }
+          ].map((tag) => (
+            <label key={tag.key} className="flex items-center justify-between cursor-pointer text-sm text-gray-600 hover:text-emerald-600 transition-colors p-2 rounded-lg hover:bg-emerald-50">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={!!selectedFilters[tag.key]}
+                  onChange={() => handleSpecialTagChange(tag.key)}
+                  className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
+                />
+                <span>{tag.label}</span>
+              </div>
+              <span className="text-xs text-gray-400">
+                {filters.specialTags?.[tag.key] || 0}
+              </span>
+            </label>
+          ))}
         </div>
       </div>
     </div>

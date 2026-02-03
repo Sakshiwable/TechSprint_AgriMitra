@@ -1,99 +1,260 @@
+from fastapi import FastAPI, WebSocket, HTTPException, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict
+import logging
+from translator import Translator
+from config import settings
 
-import os
-import json
-import argostranslate.package
-import argostranslate.translate
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+# Configure logging
+logging.basicConfig(level=settings.LOG_LEVEL)
+logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
-CORS(app)
+app = FastAPI(
+    title="AgriMitra Translation Service",
+    description="Production-grade multilingual translation API using LibreTranslate",
+    version="1.0.0"
+)
 
-# Cache for loaded valid language codes
-SUPPORTED_LANGUAGES = ['hi', 'mr', 'ta', 'te', 'kn', 'ml', 'gu', 'pa', 'bn']
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Configure appropriately for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-def install_languages():
-    """
-    Install English translation packages for supported Indian languages.
-    """
-    print("🔄 Updating package index...")
-    argostranslate.package.update_package_index()
-    available_packages = argostranslate.package.get_available_packages()
+# Initialize translator
+translator = Translator()
+
+# Request models
+class TranslationRequest(BaseModel):
+    text: str = Field(..., description="Text or HTML to translate")
+    source_lang: str = Field(default="en", description="Source language code")
+    target_lang: str = Field(..., description="Target language code")
+    preserve_html: bool = Field(default=True, description="Preserve HTML structure")
+    calculate_back_translation: bool = Field(default=False, description="Calculate back-translation for higher confidence accuracy")
+
+class BatchTranslationRequest(BaseModel):
+    texts: List[str] = Field(..., description="List of texts to translate")
+    source_lang: str = Field(default="en", description="Source language code")
+    target_lang: str = Field(..., description="Target language code")
+
+class LanguageDetectionRequest(BaseModel):
+    text: str = Field(..., description="Text to detect language from")
+
+# Response models
+class TranslationResponse(BaseModel):
+    translated_text: str
+    confidence: float
+    source_lang: str
+    target_lang: str
+    error: Optional[str] = None
+    text_nodes_count: Optional[int] = None
+
+class BatchTranslationResponse(BaseModel):
+    results: List[TranslationResponse]
+    total: int
+
+class LanguageDetectionResponse(BaseModel):
+    detected_lang: str
+    supported: bool
+
+# WebSocket connection manager
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
     
-    # We want to translate FROM English TO these languages
-    # Argos Translate uses ISO codes (usually 2 letter)
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
     
-    targets = ['hi'] # Marathi ('mr') might not be directly supported in standard Argos index, checking availability
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
     
-    # Check what is available
-    installed = argostranslate.package.get_installed_packages()
-    installed_codes = [p.to_code for p in installed]
-    
-    print(f"📦 Installed targets: {installed_codes}")
-    
-    for code in targets:
-        if code not in installed_codes:
-            print(f"📥 Installing en -> {code}...")
-            # Find package
-            package_to_install = next(
-                filter(
-                    lambda x: x.from_code == 'en' and x.to_code == code, 
-                    available_packages
-                ), 
-                None
-            )
-            
-            if package_to_install:
-                package_to_install.install()
-                print(f"✅ Installed en -> {code}")
-            else:
-                print(f"❌ Package en -> {code} not found available.")
+    async def send_personal_message(self, message: dict, websocket: WebSocket):
+        await websocket.send_json(message)
 
-# Run installation on startup (blocking, but necessary for first run)
-try:
-    install_languages()
-except Exception as e:
-    print(f"⚠️ Error installing languages: {e}")
+manager = ConnectionManager()
 
-@app.route('/health', methods=['GET'])
-def health():
-    return jsonify({"status": "ok", "service": "translation_service"})
-
-@app.route('/translate', methods=['POST'])
-def translate():
-    """
-    Request body:
-    {
-        "text": "Rice price is increasing",
-        "source": "en",
-        "target": "hi"
+# Routes
+@app.get("/")
+async def root():
+    return {
+        "service": "AgriMitra Translation Service",
+        "status": "running",
+        "supported_languages": settings.SUPPORTED_LANGUAGES
     }
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {
+        "status": "healthy",
+        "libretranslate_url": settings.LIBRETRANSLATE_URL,
+        "supported_languages": settings.SUPPORTED_LANGUAGES
+    }
+
+@app.post("/translate", response_model=TranslationResponse)
+async def translate(request: TranslationRequest):
+    """
+    Translate text or HTML content
+    
+    - **text**: Content to translate
+    - **source_lang**: Source language (default: en)
+    - **target_lang**: Target language (required)
+    - **preserve_html**: Whether to preserve HTML structure (default: true)
+    - **calculate_back_translation**: Calculate back-translation for accuracy (slower)
     """
     try:
-        data = request.json
-        text = data.get('text', '')
-        source_lang = data.get('source', 'en')
-        target_lang = data.get('target', 'hi')
+        if request.preserve_html and ('<' in request.text and '>' in request.text):
+            # HTML translation
+            result = await translator.translate_html(
+                request.text,
+                request.source_lang,
+                request.target_lang,
+                request.calculate_back_translation
+            )
+        else:
+            # Plain text translation
+            result = await translator.translate_text(
+                request.text,
+                request.source_lang,
+                request.target_lang
+            )
         
-        if not text:
-            return jsonify({"error": "No text provided"}), 400
-            
-        if target_lang == 'en':
-            return jsonify({"translated_text": text})
-            
-        # Argos Translate
-        try:
-            translated_text = argostranslate.translate.translate(text, source_lang, target_lang)
-            return jsonify({"translated_text": translated_text})
-        except Exception as e:
-            # Fallback or error
-            print(f"Translation Error: {e}")
-            # If language not supported, return original
-            return jsonify({"translated_text": text, "warning": "Translation failed, returned original"}), 200
-
+        return TranslationResponse(**result)
+    
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"Translation endpoint error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5005))
-    app.run(host='0.0.0.0', port=port, debug=True)
+@app.post("/translate/batch", response_model=BatchTranslationResponse)
+async def batch_translate(request: BatchTranslationRequest):
+    """
+    Batch translate multiple texts
+    
+    - **texts**: List of texts to translate (max 10)
+    - **source_lang**: Source language (default: en)
+    - **target_lang**: Target language (required)
+    """
+    try:
+        if len(request.texts) > settings.MAX_BATCH_SIZE:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Batch size exceeds maximum of {settings.MAX_BATCH_SIZE}"
+            )
+        
+        results = await translator.batch_translate(
+            request.texts,
+            request.source_lang,
+            request.target_lang
+        )
+        
+        return BatchTranslationResponse(
+            results=[TranslationResponse(**r) for r in results],
+            total=len(results)
+        )
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Batch translation error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/detect-language", response_model=LanguageDetectionResponse)
+async def detect_language(request: LanguageDetectionRequest):
+    """
+    Detect language of text
+    
+    - **text**: Text to analyze
+    """
+    try:
+        detected = await translator.detect_language(request.text)
+        
+        return LanguageDetectionResponse(
+            detected_lang=detected,
+            supported=detected in settings.SUPPORTED_LANGUAGES
+        )
+    
+    except Exception as e:
+        logger.error(f"Language detection error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.websocket("/ws/chat")
+async def websocket_chat_translation(websocket: WebSocket):
+    """
+    WebSocket endpoint for real-time chat translation
+    
+    Expected message format:
+    {
+        "text": "message to translate",
+        "source_lang": "en",
+        "target_langs": ["hi", "mr", "ta"]
+    }
+    
+    Response format:
+    {
+        "translations": {
+            "hi": "translated text",
+            "mr": "translated text",
+            "ta": "translated text"
+        },
+        "confidence": {
+            "hi": 0.92,
+            "mr": 0.89,
+            "ta": 0.91
+        },
+        "original_lang": "en"
+    }
+    """
+    await manager.connect(websocket)
+    
+    try:
+        while True:
+            # Receive message
+            data = await websocket.receive_json()
+            
+            text = data.get("text")
+            source_lang = data.get("source_lang", "en")
+            target_langs = data.get("target_langs", [])
+            
+            if not text or not target_langs:
+                await manager.send_personal_message({
+                    "error": "Missing required fields: text or target_langs"
+                }, websocket)
+                continue
+            
+            # Translate to all target languages
+            translations = {}
+            confidences = {}
+            
+            for target_lang in target_langs:
+                if target_lang in settings.SUPPORTED_LANGUAGES:
+                    result = await translator.translate_text(text, source_lang, target_lang)
+                    translations[target_lang] = result["translated_text"]
+                    confidences[target_lang] = result["confidence"]
+            
+            # Send response
+            await manager.send_personal_message({
+                "translations": translations,
+                "confidence": confidences,
+                "original_lang": source_lang
+            }, websocket)
+    
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        logger.info("WebSocket client disconnected")
+    except Exception as e:
+        logger.error(f"WebSocket error: {str(e)}")
+        manager.disconnect(websocket)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        app, 
+        host=settings.SERVICE_HOST, 
+        port=settings.SERVICE_PORT,
+        log_level=settings.LOG_LEVEL.lower()
+    )

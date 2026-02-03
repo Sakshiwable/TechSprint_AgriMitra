@@ -16,6 +16,7 @@
     "express": "^4.21.2",
     "flask": "^0.2.10",
     "flask-cors": "^0.0.1",
+    "google-translate-api-x": "^10.7.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.3",
     "multer": "^2.0.2",

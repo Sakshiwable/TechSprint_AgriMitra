@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { 
   Search, Plus, MapPin, MoreVertical, Phone, Video, 
   ArrowLeft, Send, Paperclip, Mic, Image as ImageIcon,
-  LogOut, X, Users, File, Sparkles, MessageCircle, Play, Pause, Volume2
+  LogOut, X, Users, File, Sparkles, MessageCircle
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -531,10 +531,7 @@ export default function CommunityPage() {
                             )}
                             
                             {msg.messageType === 'audio' ? (
-                               <AudioPlayer 
-                                 src={`http://localhost:4000${msg.content}`}
-                                 isMe={isMe}
-                               />
+                               <audio controls src={`http://localhost:4000${msg.content}`} className="w-full max-w-xs h-10 mt-1 rounded-lg" />
                             ) : msg.messageType === 'image' ? (
                                 <div className="rounded-xl overflow-hidden mt-1 max-w-xs shadow-md">
                                     <img src={`http://localhost:4000${msg.content}`} alt="Attachment" className="w-full h-auto cursor-pointer hover:scale-105 transition" onClick={() => window.open(`http://localhost:4000${msg.content}`, '_blank')} />
@@ -696,102 +693,6 @@ export default function CommunityPage() {
             </div>
           )}
         </div>
-      </div>
-    </div>
-  );
-}
-
-// Custom Audio Player Component
-function AudioPlayer({ src, isMe }) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const audioRef = useRef(null);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const updateTime = () => setCurrentTime(audio.currentTime);
-    const updateDuration = () => setDuration(audio.duration);
-    const handleEnded = () => setIsPlaying(false);
-
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('loadedmetadata', updateDuration);
-    audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('loadedmetadata', updateDuration);
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, []);
-
-  const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
-  const formatTime = (seconds) => {
-    if (!seconds || isNaN(seconds)) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-
-  return (
-    <div className={`flex items-center gap-3 mt-1 ${isMe ? 'flex-row-reverse' : ''}`}>
-      <audio ref={audioRef} src={src} preload="metadata" />
-      
-      {/* Play/Pause Button */}
-      <button
-        onClick={togglePlay}
-        className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-md hover:scale-110 ${
-          isMe 
-            ? 'bg-white/20 hover:bg-white/30 text-white' 
-            : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-        }`}
-      >
-        {isPlaying ? (
-          <Pause size={18} fill="currentColor" />
-        ) : (
-          <Play size={18} fill="currentColor" className="ml-0.5" />
-        )}
-      </button>
-
-      {/* Waveform/Progress Bar */}
-      <div className={`flex-1 min-w-[150px] max-w-[250px] ${isMe ? 'flex-row-reverse' : ''}`}>
-        <div className={`relative h-2 rounded-full overflow-hidden ${
-          isMe ? 'bg-white/20' : 'bg-gray-200'
-        }`}>
-          <div
-            className={`absolute top-0 left-0 h-full rounded-full transition-all ${
-              isMe ? 'bg-white/60' : 'bg-emerald-500'
-            }`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        
-        {/* Time Display */}
-        <div className={`flex items-center justify-between mt-1 text-xs ${
-          isMe ? 'text-white/90 flex-row-reverse' : 'text-gray-600'
-        }`}>
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
-        </div>
-      </div>
-
-      {/* Audio Icon */}
-      <div className={`flex-shrink-0 ${isMe ? 'text-white/70' : 'text-emerald-600'}`}>
-        <Volume2 size={16} />
       </div>
     </div>
   );

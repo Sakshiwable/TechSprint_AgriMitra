@@ -1,4 +1,5 @@
 import NewsAlert from '../models/NewsAlert.js';
+import translationOrchestrator from '../services/translationOrchestrator.js';
 
 // @desc    Get news alerts for a commodity
 // @route   GET /api/news/:commodity
@@ -7,6 +8,7 @@ export const getNewsAlerts = async (req, res) => {
     try {
         const { commodity } = req.params;
         const { days = 7, limit = 20 } = req.query;
+        const targetLang = req.userLanguage || 'en'; // From languageDetector middleware
         
         const startDate = new Date();
         startDate.setDate(startDate.getDate() - parseInt(days));
@@ -18,10 +20,37 @@ export const getNewsAlerts = async (req, res) => {
         .sort({ published_at: -1 })
         .limit(parseInt(limit));
         
+        // Translate if not English
+        let translatedAlerts = newsAlerts;
+        if (targetLang !== 'en') {
+            translatedAlerts = await Promise.all(
+                newsAlerts.map(async (alert) => {
+                    const alertObj = alert.toObject();
+                    
+                    // Translate headline
+                    if (alert.headline) {
+                        const translatedHeadline = await translationOrchestrator.translateContent(
+                            alert.headline,
+                            targetLang,
+                            'news_headline',
+                            `${alert._id}_headline`
+                        );
+                        alertObj.headline = translatedHeadline.text;
+                        alertObj._translationMeta = {
+                            confidence: translatedHeadline.confidence,
+                            source: translatedHeadline.source
+                        };
+                    }
+                    
+                    return alertObj;
+                })
+            );
+        }
+        
         res.json({
             success: true,
-            count: newsAlerts.length,
-            data: newsAlerts
+            count: translatedAlerts.length,
+            data: translatedAlerts
         });
     } catch (error) {
         res.status(500).json({

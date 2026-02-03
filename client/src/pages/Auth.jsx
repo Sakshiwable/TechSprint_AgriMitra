@@ -111,11 +111,7 @@ export default function Auth() {
       toast.success(
         isSignup ? "🎉 Signup successful!" : "✅ Login successful!"
       );
-      
-      // Small delay to ensure token is saved and auth state updates
-      setTimeout(() => {
-        navigate("/dashboard", { replace: true });
-      }, 100);
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       console.error("Auth error:", err.response?.data || err.message);
       toast.error(err.response?.data?.message || "Something went wrong.");

@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: agrimitra_libretranslate
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - LT_LOAD_ONLY=en,hi,mr,ta,te,kn,bn,gu
+      - LT_THREADS=4
+    volumes:
+      - ./lt-data:/home/libretranslate/.local
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/languages"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  translation-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agrimitra_translation_service
+    restart: always
+    ports:
+      - "8001:8001"
+    depends_on:
+      - libretranslate
+    environment:
+      - LIBRETRANSLATE_URL=http://libretranslate:5000
+      - SERVICE_HOST=0.0.0.0
+      - SERVICE_PORT=8001
+      - LOG_LEVEL=INFO
+    volumes:
+      - .:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

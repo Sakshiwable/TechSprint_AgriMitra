@@ -31,6 +31,22 @@ const userSchema = new mongoose.Schema(
     socketId: String,
     role: { type: String, enum: ["farmer", "expert", "admin"], default: "farmer" },
     groups: [{ type: mongoose.Schema.Types.ObjectId, ref: "Group" }],
+    
+    // Language preferences
+    languagePreference: {
+      type: String,
+      enum: ['en', 'hi', 'mr', 'ta', 'te', 'kn', 'bn', 'gu'],
+      default: 'en'
+    },
+    autoDetectLanguage: {
+      type: Boolean,
+      default: true
+    },
+    translationHistory: [{
+      from: String,
+      to: String,
+      timestamp: { type: Date, default: Date.now }
+    }]
   },
   { timestamps: true }
 );
