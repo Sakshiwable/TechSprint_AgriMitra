@@ -1,6 +1,5 @@
-import axios from 'axios';
+import translationOrchestrator from '../services/translationOrchestrator.js';
 
-const TRANSLATION_API_URL = 'https://api.mymemory.translated.net/get';
 const translationCache = new Map();
 
 const SKIP_FIELDS = [
@@ -8,6 +7,8 @@ const SKIP_FIELDS = [
   'token', 'url', 'src', 'href', 'image', 'avatar', 'file', 'path',
   'status', 'code', 'type', 'method', '__v', 'hash', 'salt'
 ];
+
+const SUPPORTED_LANGUAGES = ['en', 'hi', 'mr', 'ta', 'te', 'kn', 'bn', 'gu', 'ml', 'pa', 'or', 'as'];
 
 const shouldTranslateString = (str) => {
   if (!str || typeof str !== 'string' || str.length < 2) return false;
@@ -25,7 +26,7 @@ const shouldTranslateString = (str) => {
 };
 
 const translateText = async (text, targetLang) => {
-  if (!shouldTranslateString(text) || targetLang === 'en') {
+  if (!shouldTranslateString(text) || targetLang === 'en' || !SUPPORTED_LANGUAGES.includes(targetLang)) {
     return text;
   }
   
@@ -35,19 +36,23 @@ const translateText = async (text, targetLang) => {
   }
   
   try {
-    const response = await axios.get(TRANSLATION_API_URL, {
-      params: {
-        q: text,
-        langpair: `en|${targetLang}`
-      },
-      timeout: 5000
-    });
+    const result = await Promise.race([
+      translationOrchestrator.translateContent(
+        text,
+        targetLang,
+        'auto_translate',
+        cacheKey
+      ),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Translation timeout')), 5000)
+      )
+    ]);
     
-    const translatedText = response.data?.responseData?.translatedText || text;
+    const translatedText = result.text || text;
     translationCache.set(cacheKey, translatedText);
     return translatedText;
   } catch (error) {
-    console.error('Translation error:', error.message);
+    translationCache.set(cacheKey, text); // Cache original to avoid retries
     return text;
   }
 };
@@ -81,9 +86,9 @@ const deepTranslateObject = async (obj, targetLang) => {
 };
 
 export const autoTranslateMiddleware = async (req, res, next) => {
-  const targetLang = req.headers['x-language'] || req.query.lang || 'en';
+  const targetLang = req.userLanguage || 'en';
   
-  if (targetLang === 'en') {
+  if (targetLang === 'en' || !SUPPORTED_LANGUAGES.includes(targetLang)) {
     return next();
   }
   
@@ -92,12 +97,11 @@ export const autoTranslateMiddleware = async (req, res, next) => {
   res.json = async function(data) {
     try {
       if (data && (typeof data === 'object' || Array.isArray(data))) {
-        console.log('Translating response to:', targetLang);
         const translatedData = await deepTranslateObject(data, targetLang);
         return originalJson.call(this, translatedData);
       }
     } catch (error) {
-      console.error('Auto-translation error:', error.message);
+      // Silent fallback
     }
     
     return originalJson.call(this, data);

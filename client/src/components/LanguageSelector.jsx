@@ -46,6 +46,7 @@ const LanguageSelector = () => {
               key={lang.code}
               className={`lang-option ${lang.code === language ? "active" : ""}`}
               onClick={() => handleLanguageChange(lang)}
+              
             >
               <span className="flag">{lang.flag}</span>
               <div className="lang-info">

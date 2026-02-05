@@ -76,5 +76,19 @@
   "justNow": "ഇപ്പോൾ",
   "showing": "കാണിക്കുന്നു",
   "records": "രെക്കോർഡുകൾ",
-  "all": "എല്ലാം"
+  "all": "എല്ലാം",
+  "languages": {
+    "en": { "name": "ഇംഗ്ലീഷ്", "nativeName": "English" },
+    "hi": { "name": "ഹിന്ദി", "nativeName": "हिंदी" },
+    "mr": { "name": "മറാത്തി", "nativeName": "मराठी" },
+    "ta": { "name": "തമിഴ്", "nativeName": "தமிழ்" },
+    "te": { "name": "തെലുങ്ക്", "nativeName": "తెలుగు" },
+    "kn": { "name": "കന്നഡ", "nativeName": "ಕನ್ನಡ" },
+    "bn": { "name": "ബംഗാളി", "nativeName": "বাংলা" },
+    "gu": { "name": "ഗുജരാതി", "nativeName": "ગુજરાતી" },
+    "ml": { "name": "മലയാളം", "nativeName": "മലയാളം" },
+    "pa": { "name": "പഞ്ചാബി", "nativeName": "ਪੰਜਾਬੀ" },
+    "or": { "name": "ഒഡിയ", "nativeName": "ଓଡ଼ିଆ" },
+    "as": { "name": "അസമീസ്", "nativeName": "অসমীয়া" }
+  }
 }

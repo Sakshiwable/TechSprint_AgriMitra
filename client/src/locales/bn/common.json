@@ -98,5 +98,19 @@
   "rainfallPatterns": "বৃষ্টিপাতের ধারা",
   "rainfallPatternsDesc": "অনিয়মিত বৃষ্টিপাত এবং মৌসুমী পরিবর্তন ট্র্যাক করুন",
   "seasonalForecasts": "মৌসুমী পূর্বাভাস",
-  "seasonalForecastsDesc": "জলবাযু ভবিষ্যদ্বাণীর ভিত্তিতে আপনার চাষাবাদের কার্যক্রম পরিকল্পনা করুন"
+  "seasonalForecastsDesc": "জলবাযু ভবিষ্যদ্বাণীর ভিত্তিতে আপনার চাষাবাদের কার্যক্রম পরিকল্পনা করুন",
+  "languages": {
+    "en": { "name": "ইংরেজি", "nativeName": "English" },
+    "hi": { "name": "হিন্দি", "nativeName": "हिंदी" },
+    "mr": { "name": "মারাঠি", "nativeName": "मराठी" },
+    "ta": { "name": "তামিল", "nativeName": "தமிழ்" },
+    "te": { "name": "তেলুগু", "nativeName": "తెలుగు" },
+    "kn": { "name": "কন্নড়", "nativeName": "ಕನ್ನಡ" },
+    "bn": { "name": "বাংলা", "nativeName": "বাংলা" },
+    "gu": { "name": "গুজরাটি", "nativeName": "ગુજરાતી" },
+    "ml": { "name": "মলয়ালম", "nativeName": "മലയാളം" },
+    "pa": { "name": "পাঞ্জাবি", "nativeName": "ਪੰਜਾਬੀ" },
+    "or": { "name": "ওড়িয়া", "nativeName": "ଓଡ଼ିଆ" },
+    "as": { "name": "অসমীয়া", "nativeName": "অসমীয়া" }
+  }
 }

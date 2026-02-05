@@ -14,7 +14,7 @@ router.patch('/language', protect, async (req, res) => {
     const { languagePreference } = req.body;
     
     // Validate language code
-    const validLanguages = ['en', 'hi', 'mr', 'ta', 'te', 'kn', 'bn', 'gu'];
+    const validLanguages = ['en', 'hi', 'mr', 'ta', 'te', 'kn', 'bn', 'gu', 'ml', 'pa', 'or', 'as'];
     if (!validLanguages.includes(languagePreference)) {
       return res.status(400).json({ 
         message: 'Invalid language code',

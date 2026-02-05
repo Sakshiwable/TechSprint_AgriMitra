@@ -76,5 +76,19 @@
   "justNow": "ಇಪ್ಪುಡೇ",
   "showing": "ತೋರಿಸುತ್ತಿದೆ",
   "records": "ರೆಕಾರ್ಡ್ಗಳು",
-  "all": "ಎಲ್ಲಾ"
+  "all": "ಎಲ್ಲಾ",
+  "languages": {
+    "en": { "name": "ಆಂಗ್ಲ", "nativeName": "English" },
+    "hi": { "name": "ಹಿಂದಿ", "nativeName": "हिंदी" },
+    "mr": { "name": "ಮರಾಠಿ", "nativeName": "मराठी" },
+    "ta": { "name": "ತಮಿಳು", "nativeName": "தமிழ்" },
+    "te": { "name": "ತೆಲುಗು", "nativeName": "తెలుగు" },
+    "kn": { "name": "ಕನ್ನಡ", "nativeName": "ಕನ್ನಡ" },
+    "bn": { "name": "ಬೆಂಗಾಲಿ", "nativeName": "বাংলা" },
+    "gu": { "name": "ಗುಜರಾತಿ", "nativeName": "ગુજરાતી" },
+    "ml": { "name": "ಮಲಯಾಳಂ", "nativeName": "മലയാളം" },
+    "pa": { "name": "ಪಂಜಾಬಿ", "nativeName": "ਪੰਜਾਬੀ" },
+    "or": { "name": "ಒಡಿಯಾ", "nativeName": "ଓଡ଼ିଆ" },
+    "as": { "name": "ಅಸ್ಸಾಮಿ", "nativeName": "অসমীয়া" }
+  }
 }

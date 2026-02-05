@@ -17,6 +17,11 @@ export const getMySchemes = async (req, res) => {
         } = req.query;
         const targetLang = req.userLanguage || 'en';
         
+        console.log(`[SCHEME DEBUG] Language detected: ${targetLang}, Headers:`, {
+            'x-language': req.headers['x-language'],
+            'accept-language': req.headers['accept-language']
+        });
+        
         const query = {};
         
         if (state && state !== 'all') {
@@ -50,63 +55,67 @@ export const getMySchemes = async (req, res) => {
         // Translate schemes if not English
         let translatedSchemes = schemes;
         if (targetLang !== 'en') {
+            console.log(`Translating ${schemes.length} schemes to ${targetLang}`);
             translatedSchemes = await Promise.all(
                 schemes.map(async (scheme) => {
                     const schemeObj = scheme.toObject();
                     
                     // Translate scheme name
-                    if (scheme.schemeName) {
+                    if (scheme.name) {
                         const translatedName = await translationOrchestrator.translateContent(
-                            scheme.schemeName,
+                            scheme.name,
                             targetLang,
                             'scheme',
                             `${scheme._id}_name`
                         );
-                        schemeObj.schemeName = translatedName.text;
+                        schemeObj.name = translatedName.text;
                     }
                     
                     // Translate description if exists
-                    if (scheme.description) {
+                    if (scheme.shortDescription) {
                         const translatedDesc = await translationOrchestrator.translateContent(
-                            scheme.description,
+                            scheme.shortDescription,
                             targetLang,
                             'scheme',
                             `${scheme._id}_desc`
                         );
-                        schemeObj.description = translatedDesc.text;
+                        schemeObj.shortDescription = translatedDesc.text;
                     }
                     
                     // Translate benefits if exists
-                    if (scheme.benefits) {
+                    if (scheme.details?.benefits) {
                         const translatedBenefits = await translationOrchestrator.translateContent(
-                            scheme.benefits,
+                            scheme.details.benefits,
                             targetLang,
                             'scheme',
                             `${scheme._id}_benefits`
                         );
-                        schemeObj.benefits = translatedBenefits.text;
+                        schemeObj.details = schemeObj.details || {};
+                        schemeObj.details.benefits = translatedBenefits.text;
                     }
                     
                     // Translate eligibility if exists
-                    if (scheme.eligibility) {
+                    if (scheme.details?.eligibility) {
                         const translatedEligibility = await translationOrchestrator.translateContent(
-                            scheme.eligibility,
+                            scheme.details.eligibility,
                             targetLang,
                             'scheme',
                             `${scheme._id}_eligibility`
                         );
-                        schemeObj.eligibility = translatedEligibility.text;
+                        schemeObj.details = schemeObj.details || {};
+                        schemeObj.details.eligibility = translatedEligibility.text;
                     }
                     
-                    // Translate how to apply if exists
-                    if (scheme.howToApply) {
-                        const translatedHowToApply = await translationOrchestrator.translateContent(
-                            scheme.howToApply,
+                    // Translate application process if exists
+                    if (scheme.details?.applicationProcess) {
+                        const translatedProcess = await translationOrchestrator.translateContent(
+                            scheme.details.applicationProcess,
                             targetLang,
                             'scheme',
-                            `${scheme._id}_howToApply`
+                            `${scheme._id}_process`
                         );
-                        schemeObj.howToApply = translatedHowToApply.text;
+                        schemeObj.details = schemeObj.details || {};
+                        schemeObj.details.applicationProcess = translatedProcess.text;
                     }
                     
                     return schemeObj;

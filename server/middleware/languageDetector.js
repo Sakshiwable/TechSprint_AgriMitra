@@ -3,7 +3,7 @@
  * Detects user's preferred language from multiple sources
  */
 
-const SUPPORTED_LANGUAGES = ['en', 'hi', 'mr', 'ta', 'te', 'kn', 'bn', 'gu'];
+const SUPPORTED_LANGUAGES = ['en', 'hi', 'mr', 'ta', 'te', 'kn', 'bn', 'gu', 'ml', 'pa', 'or', 'as'];
 const DEFAULT_LANGUAGE = 'en';
 
 export const languageDetector = async (req, res, next) => {

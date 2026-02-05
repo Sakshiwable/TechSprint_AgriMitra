@@ -19,6 +19,7 @@ import weatherRoutes from "./routes/weather.js";
 import newsRoutes from "./routes/news.js";
 import userLanguageRoutes from "./routes/userLanguageRoutes.js";
 import translationRoutes from "./routes/translationRoutesNew.js";
+import debugRoutes from "./routes/debugRoutes.js";
 import path from "path"; // Required for static serving
 import { fileURLToPath } from "url";
 
@@ -69,6 +70,9 @@ app.use("/api/chat", chatRoutes);
 
 // Translation route (dynamic content translation)
 app.use("/api/translate", translationRoutes);
+
+// Debug route
+app.use("/api/debug", debugRoutes);
 
 // 📂 Serve Static Uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

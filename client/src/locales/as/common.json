@@ -76,5 +76,19 @@
   "justNow": "এই মাত্র",
   "showing": "দেখুৱাইছে",
   "records": "রেকর্ড",
-  "all": "সকলো"
+  "all": "সকলো",
+  "languages": {
+    "en": { "name": "ইংৰাজী", "nativeName": "English" },
+    "hi": { "name": "হিন্দী", "nativeName": "हिंदी" },
+    "mr": { "name": "মাৰাঠী", "nativeName": "मराठी" },
+    "ta": { "name": "তামিল", "nativeName": "தமிழ்" },
+    "te": { "name": "তেলেগু", "nativeName": "తెలుగు" },
+    "kn": { "name": "কন্নড়", "nativeName": "ಕನ್ನಡ" },
+    "bn": { "name": "বঙালী", "nativeName": "বাংলা" },
+    "gu": { "name": "গুজৰাটী", "nativeName": "ગુજરાતી" },
+    "ml": { "name": "মলয়ালম", "nativeName": "മലയാളം" },
+    "pa": { "name": "পঞ্জাবী", "nativeName": "ਪੰਜਾਬੀ" },
+    "or": { "name": "ওড়িয়া", "nativeName": "ଓଡ଼ିଆ" },
+    "as": { "name": "অসমীয়া", "nativeName": "অসমীয়া" }
+  }
 }

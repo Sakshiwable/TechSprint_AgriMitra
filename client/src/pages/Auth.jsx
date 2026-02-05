@@ -111,7 +111,7 @@ export default function Auth() {
       toast.success(
         isSignup ? "🎉 Signup successful!" : "✅ Login successful!"
       );
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     } catch (err) {
       console.error("Auth error:", err.response?.data || err.message);
       toast.error(err.response?.data?.message || "Something went wrong.");

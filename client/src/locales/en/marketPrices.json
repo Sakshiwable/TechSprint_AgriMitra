@@ -1,0 +1,20 @@
+{
+  "marketPrices": "Market Prices",
+  "realTimeMarketPrices": "Real-time market prices and trends from APMC mandis across India",
+  "state": "State",
+  "apmc": "APMC / Mandi",
+  "commodity": "Commodity",
+  "fromDate": "From Date",
+  "toDate": "To Date",
+  "all": "All",
+  "refresh": "Refresh",
+  "exportCSV": "Export CSV",
+  "clearAll": "Clear All",
+  "searchCommodity": "Search commodity, state, or market...",
+  "lastUpdated": "Last Updated",
+  "showing": "Showing",
+  "records": "records",
+  "loadingMarketData": "Loading market data...",
+  "noDataAvailable": "No data available",
+  "tryAdjustingFilters": "Try adjusting your filters or refresh the data"
+}

@@ -76,5 +76,19 @@
   "justNow": "ਹੁਣ ਹੀ",
   "showing": "ਦਿਖਾ ਰਿਹਾ",
   "records": "ਰਿਕਾਰਡ",
-  "all": "ਸਾਰੇ"
+  "all": "ਸਾਰੇ",
+  "languages": {
+    "en": { "name": "ਅੰਗਰੇਜ਼ੀ", "nativeName": "English" },
+    "hi": { "name": "ਹਿੰਦੀ", "nativeName": "हिंदी" },
+    "mr": { "name": "ਮਰਾਠੀ", "nativeName": "मराठी" },
+    "ta": { "name": "ਤਮਿਲ", "nativeName": "தமிழ்" },
+    "te": { "name": "ਤੇਲਗੂ", "nativeName": "తెలుగు" },
+    "kn": { "name": "ਕੰਨੜ", "nativeName": "ಕನ್ನಡ" },
+    "bn": { "name": "ਬੰਗਾਲੀ", "nativeName": "বাংলা" },
+    "gu": { "name": "ਗੁਜਰਾਤੀ", "nativeName": "ગુજરાતી" },
+    "ml": { "name": "ਮਲਿਆਲਮ", "nativeName": "മലയാളം" },
+    "pa": { "name": "ਪੰਜਾਬੀ", "nativeName": "ਪੰਜਾਬੀ" },
+    "or": { "name": "ਓਡੀਆ", "nativeName": "ଓଡ଼ିଆ" },
+    "as": { "name": "ਅਸਾਮੀ", "nativeName": "অসমীয়া" }
+  }
 }

@@ -1,9 +1,9 @@
 import libretranslatepy
 from typing import List, Dict, Optional
 import logging
-from .html_parser import HTMLParser
-from .confidence_scorer import ConfidenceScorer
-from .config import settings
+from html_parser import HTMLParser
+from confidence_scorer import ConfidenceScorer
+from config import settings
 
 logger = logging.getLogger(__name__)
 

@@ -76,5 +76,19 @@
   "justNow": "आताच",
   "showing": "दाखवत आहे",
   "records": "रेकॉर्ड",
-  "all": "सर्व"
+  "all": "सर्व",
+  "languages": {
+    "en": { "name": "इंग्रजी", "nativeName": "English" },
+    "hi": { "name": "हिंदी", "nativeName": "हिंदी" },
+    "mr": { "name": "मराठी", "nativeName": "मराठी" },
+    "ta": { "name": "तमिळ", "nativeName": "தமிழ்" },
+    "te": { "name": "तेलुगू", "nativeName": "తెలుగు" },
+    "kn": { "name": "कन्नड", "nativeName": "ಕನ್ನಡ" },
+    "bn": { "name": "बंगाली", "nativeName": "বাংলা" },
+    "gu": { "name": "गुजराती", "nativeName": "ગુજરાતી" },
+    "ml": { "name": "मलयाळम", "nativeName": "മലയാളം" },
+    "pa": { "name": "पंजाबी", "nativeName": "ਪੰਜਾਬੀ" },
+    "or": { "name": "ओडिया", "nativeName": "ଓଡ଼ିଆ" },
+    "as": { "name": "आसामी", "nativeName": "অসমীয়া" }
+  }
 }

@@ -76,5 +76,19 @@
   "justNow": "இப்போது",
   "showing": "காட்டுகிறது",
   "records": "பதிவுகள்",
-  "all": "அனைத்தும்"
+  "all": "அனைத்தும்",
+  "languages": {
+    "en": { "name": "ஆங்கிலம்", "nativeName": "English" },
+    "hi": { "name": "இந்தி", "nativeName": "हिंदी" },
+    "mr": { "name": "மராத்தி", "nativeName": "मराठी" },
+    "ta": { "name": "தமிழ்", "nativeName": "தமிழ்" },
+    "te": { "name": "தெலுங்கு", "nativeName": "తెలుగు" },
+    "kn": { "name": "கன்னடம்", "nativeName": "ಕನ್ನಡ" },
+    "bn": { "name": "வங்காளி", "nativeName": "বাংলা" },
+    "gu": { "name": "குஜராத்தி", "nativeName": "ગુજરાતી" },
+    "ml": { "name": "மலையாளம்", "nativeName": "മലയാളം" },
+    "pa": { "name": "பஞ்சாபி", "nativeName": "ਪੰਜਾਬੀ" },
+    "or": { "name": "ஒடியா", "nativeName": "ଓଡ଼ିଆ" },
+    "as": { "name": "அசாமி", "nativeName": "অসমীয়া" }
+  }
 }

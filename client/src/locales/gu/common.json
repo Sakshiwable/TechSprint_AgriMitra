@@ -76,5 +76,19 @@
   "justNow": "અભી અભી",
   "showing": "દર્શાવે છે",
   "records": "રેકોર્ડ",
-  "all": "બધું"
+  "all": "બધું",
+  "languages": {
+    "en": { "name": "અંગ્રેજી", "nativeName": "English" },
+    "hi": { "name": "હિંદી", "nativeName": "हिंदी" },
+    "mr": { "name": "મરાઠી", "nativeName": "मराठी" },
+    "ta": { "name": "તમિલ", "nativeName": "தமிழ்" },
+    "te": { "name": "તેલુગુ", "nativeName": "తెలుగు" },
+    "kn": { "name": "કન્નડ", "nativeName": "ಕನ್ನಡ" },
+    "bn": { "name": "બંગાળી", "nativeName": "বাংলা" },
+    "gu": { "name": "ગુજરાતી", "nativeName": "ગુજરાતી" },
+    "ml": { "name": "મલયાળમ", "nativeName": "മലയാളം" },
+    "pa": { "name": "પંજાબી", "nativeName": "ਪੰਜਾਬੀ" },
+    "or": { "name": "ઓડિયા", "nativeName": "ଓଡ଼ିଆ" },
+    "as": { "name": "અસ્સામી", "nativeName": "অসমীয়া" }
+  }
 }

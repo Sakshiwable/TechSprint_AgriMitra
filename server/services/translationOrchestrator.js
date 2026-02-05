@@ -2,7 +2,7 @@ import axios from 'axios';
 import crypto from 'crypto';
 import TranslationCache from '../models/TranslationCache.js';
 
-const TRANSLATION_SERVICE_URL = process.env.TRANSLATION_SERVICE_URL || 'http://localhost:8001';
+const TRANSLATION_SERVICE_URL = process.env.TRANSLATION_SERVICE_URL || 'http://localhost:8002';
 
 class TranslationOrchestrator {
   /**
@@ -157,7 +157,7 @@ class TranslationOrchestrator {
           calculate_back_translation: false
         },
         {
-          timeout: 30000,
+          timeout: 5000,
           headers: {
             'Content-Type': 'application/json'
           }
@@ -167,9 +167,7 @@ class TranslationOrchestrator {
       return response.data;
       
     } catch (error) {
-      console.warn('Translation service unavailable, using fallback');
-      
-      // Simple fallback - return original text with low confidence
+      // Silently fail and return original text
       return {
         translated_text: text,
         confidence: 0.1,

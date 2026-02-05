@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { initializeTranslation } from '../utils/translationService';
+import { translations } from '../utils/languageTranslations';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
@@ -21,26 +21,29 @@ export const LanguageProvider = ({ children }) => {
     if (stored) return stored;
     
     const browserLang = navigator.language.split('-')[0];
-    const supported = ['en', 'hi', 'bn', 'te', 'mr', 'ta', 'gu', 'kn', 'ml', 'pa', 'or', 'as'];
+    const supported = ['en', 'hi', 'mr', 'ta', 'te', 'kn', 'bn', 'gu', 'ml', 'pa', 'or', 'as'];
     return supported.includes(browserLang) ? browserLang : 'en';
   });
   
   const [loading, setLoading] = useState(false);
   
-  const availableLanguages = [
-    { code: 'en', name: 'English', nativeName: 'English', flag: '🇮🇳' },
-    { code: 'hi', name: 'Hindi', nativeName: 'हिंदी', flag: '🇮🇳' },
-    { code: 'bn', name: 'Bengali', nativeName: 'বাংলা', flag: '🇮🇳' },
-    { code: 'te', name: 'Telugu', nativeName: 'తెలుగు', flag: '🇮🇳' },
-    { code: 'mr', name: 'Marathi', nativeName: 'मराठी', flag: '🇮🇳' },
-    { code: 'ta', name: 'Tamil', nativeName: 'தமிழ்', flag: '🇮🇳' },
-    { code: 'gu', name: 'Gujarati', nativeName: 'ગુજરાતી', flag: '🇮🇳' },
-    { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ', flag: '🇮🇳' },
-    { code: 'ml', name: 'Malayalam', nativeName: 'മലയാളം', flag: '🇮🇳' },
-    { code: 'pa', name: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
-    { code: 'or', name: 'Odia', nativeName: 'ଓଡ଼ିଆ', flag: '🇮🇳' },
-    { code: 'as', name: 'Assamese', nativeName: 'অসমীয়া', flag: '🇮🇳' }
-  ];
+  // Get translated language names based on current language
+  const availableLanguages = useMemo(() => {
+    const currentTranslations = translations[language] || translations.en;
+    const languageData = currentTranslations.languages || {};
+    
+    const languageCodes = ['en', 'hi', 'mr', 'ta', 'te', 'kn', 'bn', 'gu', 'ml', 'pa', 'or', 'as'];
+    
+    return languageCodes.map(code => {
+      const langInfo = languageData[code] || translations.en.languages[code];
+      return {
+        code,
+        name: langInfo?.name || code,
+        nativeName: langInfo?.nativeName || code,
+        flag: '🇮🇳'
+      };
+    });
+  }, [language]);
   
   const setLanguage = async (newLang) => {
     if (!availableLanguages.find(l => l.code === newLang)) {
@@ -55,9 +58,6 @@ export const LanguageProvider = ({ children }) => {
       setLanguageState(newLang);
       localStorage.setItem('userLanguage', newLang);
       
-      // Initialize comprehensive translation system
-      initializeTranslation(newLang);
-      
       // Update user profile if authenticated
       const token = localStorage.getItem('token');
       if (token) {
@@ -68,8 +68,7 @@ export const LanguageProvider = ({ children }) => {
             { 
               headers: { 
                 Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'X-Language': newLang
+                'Content-Type': 'application/json'
               } 
             }
           );
@@ -88,11 +87,16 @@ export const LanguageProvider = ({ children }) => {
     }
   };
   
-  // Set axios default header for all requests and initialize translation
+  // Set axios default header for all requests
   useEffect(() => {
     axios.defaults.headers.common['X-Language'] = language;
-    initializeTranslation(language);
   }, [language]);
+  
+  // Translation function
+  const t = (key) => {
+    const currentTranslations = translations[language] || translations.en;
+    return currentTranslations[key] || key;
+  };
   
   const value = {
     language,
@@ -100,7 +104,8 @@ export const LanguageProvider = ({ children }) => {
     availableLanguages,
     supportedLanguages: availableLanguages, // Backward compatibility
     loading,
-    currentLanguage: availableLanguages.find(l => l.code === language)
+    currentLanguage: availableLanguages.find(l => l.code === language),
+    t
   };
   
   return (

@@ -28,10 +28,58 @@ export const requestCommunity = async (req, res) => {
 // Get All Approved Communities
 export const getCommunities = async (req, res) => {
   try {
+    const targetLang = req.userLanguage || 'en';
+    
     const communities = await Community.find({ status: "approved" })
       .populate("members", "name avatar") // Show some member info
       .sort({ createdAt: -1 });
-    res.status(200).json(communities);
+    
+    // Translate community names and descriptions if not English
+    let translatedCommunities = communities;
+    if (targetLang !== 'en') {
+      translatedCommunities = await Promise.all(
+        communities.map(async (community) => {
+          const communityObj = community.toObject();
+          
+          // Translate community name
+          if (community.name) {
+            const translatedName = await translationOrchestrator.translateContent(
+              community.name,
+              targetLang,
+              'community_name',
+              `${community._id}_name`
+            );
+            communityObj.name = translatedName.text;
+          }
+          
+          // Translate community description
+          if (community.description) {
+            const translatedDesc = await translationOrchestrator.translateContent(
+              community.description,
+              targetLang,
+              'community_description',
+              `${community._id}_desc`
+            );
+            communityObj.description = translatedDesc.text;
+          }
+          
+          // Translate community topic
+          if (community.topic) {
+            const translatedTopic = await translationOrchestrator.translateContent(
+              community.topic,
+              targetLang,
+              'community_topic',
+              `${community._id}_topic`
+            );
+            communityObj.topic = translatedTopic.text;
+          }
+          
+          return communityObj;
+        })
+      );
+    }
+    
+    res.status(200).json(translatedCommunities);
   } catch (error) {
     res.status(500).json({ message: "Error fetching communities", error: error.message });
   }
@@ -83,10 +131,53 @@ export const leaveCommunity = async (req, res) => {
 export const getCommunityDetails = async (req, res) => {
   try {
     const { communityId } = req.params;
+    const targetLang = req.userLanguage || 'en';
+    
     const community = await Community.findById(communityId).populate("members", "name avatar");
     if (!community) return res.status(404).json({ message: "Community not found" });
 
-    res.status(200).json(community);
+    // Translate community details if not English
+    let translatedCommunity = community;
+    if (targetLang !== 'en') {
+      const communityObj = community.toObject();
+      
+      // Translate community name
+      if (community.name) {
+        const translatedName = await translationOrchestrator.translateContent(
+          community.name,
+          targetLang,
+          'community_name',
+          `${community._id}_name`
+        );
+        communityObj.name = translatedName.text;
+      }
+      
+      // Translate community description
+      if (community.description) {
+        const translatedDesc = await translationOrchestrator.translateContent(
+          community.description,
+          targetLang,
+          'community_description',
+          `${community._id}_desc`
+        );
+        communityObj.description = translatedDesc.text;
+      }
+      
+      // Translate community topic
+      if (community.topic) {
+        const translatedTopic = await translationOrchestrator.translateContent(
+          community.topic,
+          targetLang,
+          'community_topic',
+          `${community._id}_topic`
+        );
+        communityObj.topic = translatedTopic.text;
+      }
+      
+      translatedCommunity = communityObj;
+    }
+
+    res.status(200).json(translatedCommunity);
   } catch (error) {
     res.status(500).json({ message: "Error fetching community details", error: error.message });
   }

@@ -73,7 +73,7 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
             value={selectedFilters.state || ''}
             onChange={(e) => handleDropdownChange('state', e.target.value)}
           >
-            <option value="">{t('Select')}</option>
+            <option value="">{t('select')}</option>
             <option value="Andhra Pradesh">Andhra Pradesh</option>
             <option value="Maharashtra">Maharashtra</option>
             <option value="Karnataka">Karnataka</option>
@@ -104,7 +104,7 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
                   onChange={() => handleCheckboxChange('gender', 'Male')}
                   className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
                 />
-                <span>Male</span>
+                <span>{t('male')}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600 hover:text-emerald-600 transition-colors">
                 <input
@@ -113,7 +113,7 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
                   onChange={() => handleCheckboxChange('gender', 'Female')}
                   className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
                 />
-                <span>Female</span>
+                <span>{t('female')}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600 hover:text-emerald-600 transition-colors">
                 <input
@@ -122,7 +122,7 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
                   onChange={() => handleCheckboxChange('gender', 'Transgender')}
                   className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
                 />
-                <span>Transgender</span>
+                <span>{t('transgender')}</span>
               </label>
             </div>
           )}
@@ -136,7 +136,7 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
             value={selectedFilters.age || ''}
             onChange={(e) => handleDropdownChange('age', e.target.value)}
           >
-            <option value="">Select</option>
+            <option value="">{t('select')}</option>
             <option value="18-35">18-35</option>
             <option value="35-60">35-60</option>
             <option value="60+">60+</option>
@@ -241,7 +241,7 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
             value={selectedFilters.disability || ''}
             onChange={(e) => handleDropdownChange('disability', e.target.value)}
           >
-            <option value="">Select</option>
+            <option value="">{t('select')}</option>
             <option value="40-60%">40-60%</option>
             <option value="60-80%">60-80%</option>
             <option value="80%+">80%+</option>
@@ -286,7 +286,7 @@ const FilterSidebar = ({ filters, selectedFilters, onFilterChange, onResetFilter
             value={selectedFilters.occupation || ''}
             onChange={(e) => handleDropdownChange('occupation', e.target.value)}
           >
-            <option value="">Select</option>
+            <option value="">{t('select')}</option>
             <option value="Farmer">Farmer</option>
             <option value="Student">Student</option>
             <option value="Business">Business</option>

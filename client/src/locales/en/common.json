@@ -98,5 +98,19 @@
   "rainfallPatterns": "Rainfall Patterns",
   "rainfallPatternsDesc": "Track irregular rainfall and seasonal variations",
   "seasonalForecasts": "Seasonal Forecasts",
-  "seasonalForecastsDesc": "Plan your farming activities based on climate predictions"
+  "seasonalForecastsDesc": "Plan your farming activities based on climate predictions",
+  "languages": {
+    "en": { "name": "English", "nativeName": "English" },
+    "hi": { "name": "Hindi", "nativeName": "हिंदी" },
+    "mr": { "name": "Marathi", "nativeName": "मराठी" },
+    "ta": { "name": "Tamil", "nativeName": "தமிழ்" },
+    "te": { "name": "Telugu", "nativeName": "తెలుగు" },
+    "kn": { "name": "Kannada", "nativeName": "ಕನ್ನಡ" },
+    "bn": { "name": "Bengali", "nativeName": "বাংলা" },
+    "gu": { "name": "Gujarati", "nativeName": "ગુજરાતી" },
+    "ml": { "name": "Malayalam", "nativeName": "മലയാളം" },
+    "pa": { "name": "Punjabi", "nativeName": "ਪੰਜਾਬੀ" },
+    "or": { "name": "Odia", "nativeName": "ଓଡ଼ିଆ" },
+    "as": { "name": "Assamese", "nativeName": "অসমীয়া" }
+  }
 }

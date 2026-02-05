@@ -1,0 +1,20 @@
+{
+  "marketPrices": "बाजार भाव",
+  "realTimeMarketPrices": "भारतातील APMC मंडींकडून रिअल-टाइम बाजार भाव आणि ट्रेंड",
+  "state": "राज्य",
+  "apmc": "APMC / मंडी",
+  "commodity": "वस्तू",
+  "fromDate": "तारखेपासून",
+  "toDate": "तारखेपर्यंत",
+  "all": "सर्व",
+  "refresh": "रिफ्रेश",
+  "exportCSV": "CSV निर्यात",
+  "clearAll": "सर्व साफ करा",
+  "searchCommodity": "वस्तू, राज्य किंवा बाजार शोधा...",
+  "lastUpdated": "शेवटचे अपडेट",
+  "showing": "दाखवत आहे",
+  "records": "रेकॉर्ड",
+  "loadingMarketData": "बाजार डेटा लोड होत आहे...",
+  "noDataAvailable": "डेटा उपलब्ध नाही",
+  "tryAdjustingFilters": "तुमचे फिल्टर समायोजित करा किंवा डेटा रिफ्रेश करा"
+}

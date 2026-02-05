@@ -76,5 +76,19 @@
   "justNow": "ଏବେ",
   "showing": "ଦେଖାଉଛି",
   "records": "ରେକର୍ଡ",
-  "all": "ସବୁ"
+  "all": "ସବୁ",
+  "languages": {
+    "en": { "name": "ଇଂରାଜୀ", "nativeName": "English" },
+    "hi": { "name": "ହିନ୍ଦୀ", "nativeName": "हिंदी" },
+    "mr": { "name": "ମରାଠୀ", "nativeName": "मराठी" },
+    "ta": { "name": "ତାମିଲ", "nativeName": "தமிழ்" },
+    "te": { "name": "ତେଲୁଗୁ", "nativeName": "తెలుగు" },
+    "kn": { "name": "କନ୍ନଡ", "nativeName": "ಕನ್ನಡ" },
+    "bn": { "name": "ବଙ୍ଗାଳୀ", "nativeName": "বাংলা" },
+    "gu": { "name": "ଗୁଜରାଟୀ", "nativeName": "ગુજરાતી" },
+    "ml": { "name": "ମଲୟାଳମ", "nativeName": "മലയാളം" },
+    "pa": { "name": "ପଞ୍ଜାବୀ", "nativeName": "ਪੰਜਾਬੀ" },
+    "or": { "name": "ଓଡ଼ିଆ", "nativeName": "ଓଡ଼ିଆ" },
+    "as": { "name": "ଅସମୀୟା", "nativeName": "অসমীয়া" }
+  }
 }

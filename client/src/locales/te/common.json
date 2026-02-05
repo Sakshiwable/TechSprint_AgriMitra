@@ -98,5 +98,19 @@
   "rainfallPatterns": "వర్షాల ప్రతిమానాలు",
   "rainfallPatternsDesc": "అనియమిత వర్షాలు మరియు మౌసమీ మార్పులను ట్రాక్ చేయండి",
   "seasonalForecasts": "మౌసమీ పూర్వానుమానాలు",
-  "seasonalForecastsDesc": "వాతావరణ పూర్వానుమానాల ఆధారంగా మీ వేసవి కార్యకలాపాలను ప్లాన్ చేయండి"
+  "seasonalForecastsDesc": "వాతావరణ పూర్వానుమానాల ఆధారంగా మీ వేసవి కార్యకలాపాలను ప్లాన్ చేయండి",
+  "languages": {
+    "en": { "name": "ఆంగ్లం", "nativeName": "English" },
+    "hi": { "name": "హిందీ", "nativeName": "हिंदी" },
+    "mr": { "name": "మరాఠీ", "nativeName": "मराठी" },
+    "ta": { "name": "తమిళం", "nativeName": "தமிழ்" },
+    "te": { "name": "తెలుగు", "nativeName": "తెలుగు" },
+    "kn": { "name": "కన్నడ", "nativeName": "ಕನ್ನಡ" },
+    "bn": { "name": "బెంగాలీ", "nativeName": "বাংলা" },
+    "gu": { "name": "గుజరాతీ", "nativeName": "ગુજરાતી" },
+    "ml": { "name": "మలయాళం", "nativeName": "മലയാളം" },
+    "pa": { "name": "పంజాబీ", "nativeName": "ਪੰਜਾਬੀ" },
+    "or": { "name": "ఒడియా", "nativeName": "ଓଡ଼ିଆ" },
+    "as": { "name": "అస్సామీ", "nativeName": "অসমীয়া" }
+  }
 }

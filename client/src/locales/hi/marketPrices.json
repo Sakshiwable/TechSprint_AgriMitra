@@ -1,0 +1,20 @@
+{
+  "marketPrices": "बाजार मूल्य",
+  "realTimeMarketPrices": "भारत भर के APMC मंडियों से वास्तविक समय के बाजार मूल्य और रुझान",
+  "state": "राज्य",
+  "apmc": "APMC / मंडी",
+  "commodity": "वस्तु",
+  "fromDate": "तारीख से",
+  "toDate": "तारीख तक",
+  "all": "सभी",
+  "refresh": "रिफ्रेश",
+  "exportCSV": "CSV निर्यात",
+  "clearAll": "सभी साफ़ करें",
+  "searchCommodity": "वस्तु, राज्य या बाजार खोजें...",
+  "lastUpdated": "अंतिम अपडेट",
+  "showing": "दिखा रहे हैं",
+  "records": "रिकॉर्ड",
+  "loadingMarketData": "बाजार डेटा लोड हो रहा है...",
+  "noDataAvailable": "कोई डेटा उपलब्ध नहीं है",
+  "tryAdjustingFilters": "अपने फ़िल्टर समायोजित करें या डेटा रिफ्रेश करें"
+}

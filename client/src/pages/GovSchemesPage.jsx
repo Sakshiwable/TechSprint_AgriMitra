@@ -2,15 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { fetchMySchemes, fetchFilters } from '../api/govSchemeApi';
 import FilterSidebar from '../components/FilterSidebar';
 import SchemeCard from '../components/SchemeCard';
-import { Search, Filter, BookOpen } from 'lucide-react';
-import { useTranslation } from '../hooks/useTranslation';
+import { Search, Filter, BookOpen, ChevronLeft, ChevronRight, FileText, Calendar, Users, Award, ChevronDown, X } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../hooks/useTranslation';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const GovSchemesPage = () => {
-  const { t } = useTranslation();
   const [schemes, setSchemes] = useState([]);
   const [filters, setFilters] = useState({});
   const [selectedFilters, setSelectedFilters] = useState({});
@@ -24,6 +24,9 @@ const GovSchemesPage = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [sortBy, setSortBy] = useState('relevance');
   const [searchTerm, setSearchTerm] = useState('');
+  
+  const { language } = useLanguage();
+  const { t } = useTranslation();
 
   const schemesRef = useRef(null);
 
@@ -148,7 +151,7 @@ const GovSchemesPage = () => {
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
-                    placeholder={t('search') + ' schemes...'}
+                    placeholder={t('searchPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 bg-white/50 border border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-700 placeholder-gray-400"
@@ -159,17 +162,17 @@ const GovSchemesPage = () => {
                   className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   <Search className="w-5 h-5" />
-                  {t('search')}
+                  {t('searchButton')}
                 </button>
                 <div className="flex items-center gap-2">
-                  <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">{t('sort')}:</label>
+                  <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">{t('sort')}</label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
                     className="px-4 py-3 bg-white/50 border border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-gray-700 cursor-pointer"
                   >
-                    <option value="relevance">Relevance</option>
-                    <option value="name">Name</option>
+                    <option value="relevance">{t('sortRelevance')}</option>
+                    <option value="name">{t('sortName')}</option>
                   </select>
                 </div>
               </form>
@@ -221,7 +224,7 @@ const GovSchemesPage = () => {
             {/* Scheme Count */}
             <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-200">
               <p className="text-gray-700 text-center">
-                We found <strong className="text-emerald-600 text-lg">{totalSchemes}</strong> schemes based on your preferences
+                {t('weFound')} <strong className="text-emerald-600 text-lg">{totalSchemes}</strong> {t('schemesBasedOnPreferences')}
               </p>
             </div>
 
@@ -229,7 +232,7 @@ const GovSchemesPage = () => {
             {loading ? (
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-12 shadow-lg border border-emerald-100 text-center">
                 <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent"></div>
-                <p className="mt-4 text-gray-600 font-medium">Loading schemes...</p>
+                <p className="mt-4 text-gray-600 font-medium">{t('loadingSchemes')}</p>
               </div>
             ) : error ? (
               <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
@@ -239,7 +242,7 @@ const GovSchemesPage = () => {
               <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-12 shadow-lg border border-emerald-100 text-center">
                 <Filter className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 font-medium">
-                  No schemes found matching your criteria. Try adjusting your filters.
+                  {t('noSchemesFound')}
                 </p>
               </div>
             ) : (
